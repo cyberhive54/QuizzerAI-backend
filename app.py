@@ -28,8 +28,12 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Mount static files for admin
+# Include the admin router BEFORE mounting static files
+app.include_router(admin_router)
+
+# Mount static files for admin and frontend AFTER router inclusion
 app.mount("/admin", StaticFiles(directory="admin"), name="admin")
+app.mount("/", StaticFiles(directory="frontend", html=True), name="frontend")
 
 # Models
 class QuizRequest(BaseModel):
@@ -54,9 +58,6 @@ class ErrorResponse(BaseModel):
     model_config = {
         "protected_namespaces": ()
     }
-
-# Include the admin router
-app.include_router(admin_router)
 
 @app.post("/generate-quiz")
 async def generate_quiz(request: Request):
