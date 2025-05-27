@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Generation Test</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #4a6fa5;
+            --secondary-color: #6c8fc7;
+            --accent-color: #ff7e5f;
+            --light-bg: #f8f9fa;
+            --dark-bg: #343a40;
+            --text-color: #333;
+            --light-text: #f8f9fa;
+            --border-radius: 10px;
+            --box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
+            color: var(--text-color);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            position: relative;
+        }
+        
+        h1 {
+            color: var(--primary-color);
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+            position: relative;
+            display: inline-block;
+        }
+        
+        h1::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 4px;
+            background: var(--accent-color);
+            border-radius: 2px;
+        }
+        
+        h2 {
+            color: var(--secondary-color);
+            font-size: 1.8rem;
+            margin: 30px 0 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--secondary-color);
+        }
+        
+        #quizForm {
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 30px;
+            margin-bottom: 40px;
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 20px;
+            align-items: center;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        #quizForm label {
+            font-weight: 600;
+            text-align: right;
+            padding-right: 15px;
+            color: var(--primary-color);
+            font-size: 1.05rem;
+        }
+        
+        #quizForm input[type="text"],
+        #quizForm input[type="number"],
+        #quizForm select,
+        #quizForm textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            transition: var(--transition);
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        
+        #quizForm input:focus,
+        #quizForm select:focus,
+        #quizForm textarea:focus {
+            outline: none;
+            border-color: var(--secondary-color);
+            box-shadow: 0 0 0 3px rgba(108, 143, 199, 0.25);
+        }
+        
+        #quizForm textarea {
+            height: 120px;
+            resize: vertical;
+        }
+        
+        #quizForm select {
+            appearance: none;
+            background-image: url('data:image/svg+xml;utf8,<svg fill="%234a6fa5" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>');
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+            background-size: 20px;
+            padding-right: 40px;
+        }
+        
+        #quizForm button {
+            width: 100%;
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+            padding: 14px 20px;
+            border: none;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-size: 1.1rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            transition: var(--transition);
+            margin-top: 20px;
+            box-shadow: 0 4px 6px rgba(50, 50, 93, 0.11), 0 1px 3px rgba(0, 0, 0, 0.08);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        #quizForm button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 7px 14px rgba(50, 50, 93, 0.1), 0 3px 6px rgba(0, 0, 0, 0.08);
+            background: linear-gradient(135deg, var(--secondary-color) 0%, var(--primary-color) 100%);
+        }
+        
+        #quizForm button:active {
+            transform: translateY(1px);
+        }
+        
+        #quizForm button::before {
+            content: '\f15c';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+        }
+        
+        .form-row {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .form-group {
+            display: contents;
+        }
+        
+        .form-group.half {
+            display: block;
+            flex: 1;
+        }
+        
+        .form-group.half label {
+            display: block;
+            text-align: left;
+            margin-bottom: 8px;
+        }
+        
+        .response-container {
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 25px;
+            margin-bottom: 40px;
+        }
+        
+        #response {
+            white-space: pre-wrap;
+            font-family: 'Courier New', monospace;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: var(--border-radius);
+            border-left: 4px solid var(--accent-color);
+            overflow-x: auto;
+            line-height: 1.5;
+            font-size: 0.95rem;
+            color: #333;
+        }
+        
+        .loading {
+            display: inline-block;
+            position: relative;
+            width: 80px;
+            height: 80px;
+            margin: 20px auto;
+        }
+        
+        .loading div {
+            position: absolute;
+            top: 33px;
+            width: 13px;
+            height: 13px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            animation-timing-function: cubic-bezier(0, 1, 1, 0);
+        }
+        
+        .loading div:nth-child(1) {
+            left: 8px;
+            animation: loading1 0.6s infinite;
+        }
+        
+        .loading div:nth-child(2) {
+            left: 8px;
+            animation: loading2 0.6s infinite;
+        }
+        
+        .loading div:nth-child(3) {
+            left: 32px;
+            animation: loading2 0.6s infinite;
+        }
+        
+        .loading div:nth-child(4) {
+            left: 56px;
+            animation: loading3 0.6s infinite;
+        }
+        
+        @keyframes loading1 {
+            0% { transform: scale(0); }
+            100% { transform: scale(1); }
+        }
+        
+        @keyframes loading2 {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(24px, 0); }
+        }
+        
+        @keyframes loading3 {
+            0% { transform: scale(1); }
+            100% { transform: scale(0); }
+        }
+        
+        @media (max-width: 768px) {
+            .form-row {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .form-group.half {
+                width: 100%;
+            }
+            
+            #quizForm {
+                grid-template-columns: 1fr;
+                gap: 10px;
+                padding: 20px;
+            }
+            
+            #quizForm label {
+                text-align: left;
+                padding-right: 0;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .container {
+                padding: 10px;
+            }
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            padding: 20px;
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-graduation-cap"></i> Quiz Generation API Test</h1>
+            <p>Create customized quizzes on any topic with various difficulty levels and question types</p>
+        </header>
+
+        <form id="quizForm">
+            <!-- Top row with Content Type and Question Type side by side -->
+            <div class="form-row">
+                <div class="form-group half">
+                    <label for="content_type"><i class="fas fa-file-code"></i> Content Type:</label>
+                    <select id="content_type" name="content_type" required>
+                        <option value="topic">Topic</option>
+                        <option value="paragraph">Paragraph</option>
+                    </select>
+                </div>
+
+                <div class="form-group half">
+                    <label for="prompt_template_name"><i class="fas fa-question-circle"></i> Question Type:</label>
+                    <select id="prompt_template_name" name="prompt_template_name" required>
+                        <option value="multiple_choice_quiz">Multiple Choice Quiz</option>
+                        <option value="true_false_quiz">True/False Quiz</option>
+                        <option value="fill_in_the_blanks_quiz">Fill in the Blanks Quiz</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Topic and Difficulty side by side -->
+            <div class="form-row">
+                <div class="form-group half">
+                    <label for="topic"><i class="fas fa-book"></i> Topic:</label>
+                    <input type="text" id="topic" name="topic" value="History of AI" required placeholder="Enter quiz topic">
+                </div>
+
+                <div class="form-group half">
+                    <label for="difficulty"><i class="fas fa-chart-line"></i> Difficulty:</label>
+                    <select id="difficulty" name="difficulty" required>
+                        <option value="easy">Easy</option>
+                        <option value="medium">Medium</option>
+                        <option value="hard">Hard</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Number of Questions and Subject side by side -->
+            <div class="form-row">
+                <div class="form-group half">
+                    <label for="num_questions"><i class="fas fa-list-ol"></i> Number of Questions:</label>
+                    <input type="number" id="num_questions" name="num_questions" value="5" min="1" max="20" required>
+                </div>
+
+                <div class="form-group half">
+                    <label for="subject"><i class="fas fa-folder"></i> Subject (Optional):</label>
+                    <input type="text" id="subject" name="subject" placeholder="E.g., Computer Science, History">
+                </div>
+            </div>
+
+            <!-- Reference Exam (Optional) -->
+            <div class="form-group">
+                <label for="reference_exam"><i class="fas fa-file-alt"></i> Reference Exam (Optional):</label>
+                <input type="text" id="reference_exam" name="reference_exam" placeholder="E.g., GMAT, SAT, IELTS">
+            </div>
+
+            <!-- Custom Instruction (Optional) -->
+            <div class="form-group">
+                <label for="custom_instruction"><i class="fas fa-edit"></i> Custom Instruction (Optional):</label>
+                <textarea id="custom_instruction" name="custom_instruction" placeholder="Add any specific instructions for quiz generation"></textarea>
+            </div>
+
+            <button type="submit">Generate Quiz</button>
+        </form>
+
+        <h2><i class="fas fa-server"></i> API Response:</h2>
+        <div class="response-container">
+            <pre id="response">Your quiz results will appear here after generation.</pre>
+        </div>
+        
+        <footer>
+            <p>© 2025 Quiz Generation API | Created for educational purposes</p>
+        </footer>
+
+    <script>
+        document.getElementById('quizForm').addEventListener('submit', async function(event) {
+            event.preventDefault();
+
+            const topic = document.getElementById('topic').value;
+            const difficulty = document.getElementById('difficulty').value;
+            const num_questions = parseInt(document.getElementById('num_questions').value);
+            const prompt_template_name = document.getElementById('prompt_template_name').value;
+            const subject = document.getElementById('subject').value;
+            const reference_exam = document.getElementById('reference_exam').value;
+            const custom_instruction = document.getElementById('custom_instruction').value;
+            const content_type = document.getElementById('content_type').value;
+
+            // Replace with a valid API key from your user_api_keys table for testing
+            const apiKey = 'cybermart_test_key'; 
+
+            const responseElement = document.getElementById('response');
+            responseElement.innerHTML = `
+                <div class="loading">
+                    <div></div><div></div><div></div><div></div>
+                </div>
+                <p>Generating quiz...</p>
+            `;
+
+            try {
+                const response = await fetch('http://localhost:8000/generate-quiz', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-User-API-Key': apiKey // Corrected header name
+                    },
+                    body: JSON.stringify({
+                        // Corrected parameter names to match backend prompt_selector
+                        "content_type": content_type, // Use selected content type
+                        "content": topic, // Still using 'topic' input for content
+                        "level": difficulty,
+                        "num_of_question": num_questions,
+                        "question_type": prompt_template_name,
+                        "subject": subject, // Include optional subject
+                        "reference_exam": reference_exam, // Include optional reference exam
+                        "custom instruction": custom_instruction // Include optional custom instruction
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    responseElement.textContent = JSON.stringify(data, null, 2);
+                } else {
+                    responseElement.textContent = 'Error: ' + (data.detail || response.statusText);
+                    responseElement.style.color = '#dc3545';
+                }
+
+            } catch (error) {
+                responseElement.textContent = 'Request failed: ' + error;
+                responseElement.style.color = '#dc3545';
+            }
+        });
+    </script>
+    </div>
+</body>
+</html>

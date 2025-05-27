@@ -1,0 +1,2048 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Admin Dashboard</title>
+<link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons|Material+Icons+Outlined|Material+Icons+Two+Tone|Material+Icons+Round|Material+Icons+Sharp" rel="stylesheet"/>
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #111827;
+            color: #D1D5DB;
+        }
+        .material-icons, .material-icons-outlined {
+            vertical-align: middle;
+        }
+        .card {
+            background-color: #1F2937;
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            width: 100%;
+        }
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+            font-weight: 500;
+            transition: background-color 0.2s ease-in-out;
+            white-space: nowrap;
+        }
+        .btn-primary {
+            background-color: #3B82F6;
+            color: white;
+        }
+        .btn-primary:hover {
+            background-color: #2563EB;
+        }
+        .btn-secondary {
+            background-color: #374151;
+            color: #D1D5DB;
+        }
+        .btn-secondary:hover {
+            background-color: #4B5563;
+        }
+        .table-container {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            margin: 0 -1.5rem;
+            padding: 0 1.5rem;
+            scrollbar-width: thin;
+            scrollbar-color: #4B5563 #1F2937;
+        }
+        .table-container::-webkit-scrollbar {
+            height: 8px;
+            width: 8px;
+        }
+        .table-container::-webkit-scrollbar-track {
+            background: #1F2937;
+            border-radius: 4px;
+        }
+        .table-container::-webkit-scrollbar-thumb {
+            background: #4B5563;
+            border-radius: 4px;
+        }
+        .table-container::-webkit-scrollbar-thumb:hover {
+            background: #6B7280;
+        }
+        /* For Firefox */
+        .table-container {
+            scrollbar-width: thin;
+            scrollbar-color: #4B5563 #1F2937;
+        }
+        /* For vertical scrollbars in the entire page */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #1F2937;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #4B5563;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #6B7280;
+        }
+        /* For Firefox */
+        * {
+            scrollbar-width: thin;
+            scrollbar-color: #4B5563 #1F2937;
+        }
+        .table {
+            min-width: 640px;
+            width: 100%;
+        }
+        .table th, .table td {
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid #374151;
+            white-space: nowrap;
+        }
+        .table th {
+            text-align: left;
+            font-weight: 600;
+            color: #9CA3AF;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+        }
+        .status-active {
+            background-color: #10B981;
+            color: white;
+            padding: 0.25rem 0.5rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            display: inline-block;
+        }
+        .quota-bar {
+            background-color: #374151;
+            border-radius: 9999px;
+            height: 0.5rem;
+            overflow: hidden;
+            min-width: 80px;
+        }
+        .quota-bar-fill {
+            background-color: #60A5FA;
+            height: 100%;
+        }
+        .tab-active {
+            background-color: #3B82F6;
+            color: white;
+        }
+        .tab-inactive {
+            background-color: #374151;
+            color: #9CA3AF;
+        }
+        .tab-inactive:hover {
+            background-color: #4B5563;
+            color: #D1D5DB;
+        }
+        @media (max-width: 640px) {
+            .card {
+                padding: 1rem;
+            }
+            .btn {
+                padding: 0.375rem 0.75rem;
+                font-size: 0.875rem;
+            }
+            .table th, .table td {
+                padding: 0.5rem 0.75rem;
+            }
+        }
+        .section-content {
+            transition: opacity 0.3s ease-in-out;
+        }
+        .section-content.hidden {
+            display: none;
+        }
+        /* Editable input fields for usage limits */
+        .ul-editable-input {
+            border: 2px solid #3B82F6;
+            background-color: #232e47;
+            color: #D1D5DB;
+            outline: none;
+            box-shadow: 0 0 0 2px #2563EB33;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .ul-editable-input:focus {
+            border-color: #2563EB;
+            box-shadow: 0 0 0 3px #3B82F666;
+        }
+        /* Add new styles for collapsible sections */
+        .collapsible-section {
+            border: 1px solid #374151;
+            border-radius: 0.5rem;
+            margin-bottom: 1rem;
+            overflow: hidden;
+        }
+        .collapsible-header {
+            background-color: #1F2937;
+            padding: 1rem;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background-color 0.2s;
+        }
+        .collapsible-header:hover {
+            background-color: #2D3748;
+        }
+        .collapsible-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+            background-color: #1F2937;
+        }
+        .collapsible-content.expanded {
+            max-height: 2000px;
+            transition: max-height 0.5s ease-in;
+        }
+        .collapsible-icon {
+            transition: transform 0.3s ease;
+        }
+        .collapsible-icon.expanded {
+            transform: rotate(180deg);
+        }
+    </style>
+</head>
+<body class="antialiased">
+<!-- Admin Password Overlay -->
+<div id="admin-password-overlay" class="fixed inset-0 z-[99999] flex items-center justify-center" style="background: rgba(0,0,0,1);">
+    <div class="bg-gray-900 rounded-lg shadow-lg p-8 w-full max-w-sm flex flex-col items-center">
+        <span class="material-icons-outlined text-5xl text-blue-400 mb-4">lock</span>
+        <h2 class="text-xl font-bold text-gray-100 mb-2">Admin Access Required</h2>
+        <p class="text-gray-400 mb-4 text-center">Enter the admin password to access this page.
+            <span id="admin-password-text" class="font-semibold text-blue-300">Admin-HU-yaar</span>
+            <button id="copy-admin-password" class="ml-2 btn btn-secondary btn-sm px-2 py-1 text-xs">
+                <span class="material-icons-outlined text-sm">content_copy</span>
+            </button>
+        </p>
+        <div class="relative w-full mb-3">
+            <input id="admin-password-input" type="password" placeholder="Password" class="rounded px-3 py-2 w-full bg-gray-800 text-gray-100 border border-gray-700 focus:outline-none focus:border-blue-500 pr-10" autocomplete="off" />
+            <button id="admin-password-toggle" type="button" class="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-blue-400 focus:outline-none">
+                <span class="material-icons-outlined" id="admin-password-toggle-icon">visibility_off</span>
+            </button>
+        </div>
+        <button id="admin-password-submit" class="btn btn-primary w-full">Unlock</button>
+        <span id="admin-password-error" class="text-red-400 mt-3 text-sm hidden">Incorrect password. Try again.</span>
+        <span id="admin-password-success" class="text-green-400 mt-3 text-sm hidden">Password correct! Unlocking...</span>
+    </div>
+</div>
+<div id="admin-content" class="hidden">
+<div class="min-h-screen p-2 sm:p-4 md:p-6 lg:p-8">
+<header class="mb-4 sm:mb-6 md:mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+<h1 class="text-lg sm:text-xl font-semibold text-gray-200">Quiz Generator Admin</h1>
+<button class="btn btn-secondary text-sm w-full sm:w-auto">
+<span class="material-icons-outlined mr-2 text-base">public</span>
+                <a href="/frontend/index.html"> Public Interface</a>
+            </button>
+</header>
+<div id="initial-load-timer-box" class="w-full max-w-md mx-auto mb-4 hidden">
+    <div class="bg-gray-800 border border-blue-500 rounded-lg px-4 py-2 flex items-center justify-center">
+        <span class="material-icons-outlined text-blue-400 mr-2">timer</span>
+        <span id="initial-load-timer-text" class="text-blue-300 font-semibold"></span>
+    </div>
+</div>
+<div class="mb-6 sm:mb-8">
+<div class="flex items-center mb-2">
+<span class="material-icons-outlined text-3xl sm:text-4xl text-blue-400 mr-3">admin_panel_settings</span>
+<h2 class="text-2xl sm:text-3xl font-bold text-gray-100">Admin Dashboard</h2>
+</div>
+<p class="text-sm sm:text-base text-gray-400">Manage users, API keys, OpenRouter settings, and monitor system usage.</p>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">
+<div class="card text-center">
+<span class="material-icons text-5xl text-purple-400 mb-3">groups</span>
+        <div id="users-count-area">
+            <div id="users-count-loading" class="flex flex-col items-center justify-center">
+                <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mb-2"></div>
+                <span class="text-gray-400">Loading...</span>
+            </div>
+            <p id="users-count" class="text-3xl font-bold text-gray-100 hidden"></p>
+        </div>
+        <p class="text-gray-400">Users</p>
+</div>
+<div class="card text-center">
+        <span class="material-icons text-5xl text-yellow-400 mb-3">smart_toy</span>
+        <div id="openrouter-count-area">
+            <div id="openrouter-count-loading" class="flex flex-col items-center justify-center">
+                <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-yellow-400 mb-2"></div>
+                <span class="text-gray-400">Loading...</span>
+            </div>
+            <p id="openrouter-count" class="text-3xl font-bold text-gray-100 hidden"></p>
+        </div>
+        <p class="text-gray-400">OpenRouter API Keys</p>
+</div>
+<div class="card text-center">
+        <span class="material-icons-outlined text-5xl text-blue-400 mb-3">model_training</span>
+        <div id="models-count-area">
+            <div id="models-count-loading" class="flex flex-col items-center justify-center">
+                <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-400 mb-2"></div>
+                <span class="text-gray-400">Loading...</span>
+            </div>
+            <p id="models-count" class="text-3xl font-bold text-gray-100 hidden"></p>
+        </div>
+        <p class="text-gray-400">Models</p>
+</div>
+<div class="card text-center">
+        <span class="material-icons-outlined text-5xl text-green-400 mb-3">assessment</span>
+        <div id="quizzes-count-area">
+            <div id="quizzes-count-loading" class="flex flex-col items-center justify-center">
+                <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-green-400 mb-2"></div>
+                <span class="text-gray-400">Loading...</span>
+            </div>
+            <p id="quizzes-count" class="text-3xl font-bold text-gray-100 hidden"></p>
+        </div>
+        <p class="text-gray-400">Quizzes</p>
+</div>
+</div>
+<nav class="mb-6 sm:mb-8">
+<ul class="flex flex-wrap gap-2">
+<li class="w-full sm:w-auto"><button class="btn tab-active" data-tab="users-section"><span class="material-icons-outlined mr-2">people_alt</span>Users &amp; API Keys</button></li>
+<li class="w-full sm:w-auto"><button class="btn tab-inactive" data-tab="openrouter-section"><span class="material-icons-outlined mr-2">router</span>OpenRouter Management</button></li>
+<li class="w-full sm:w-auto"><button class="btn tab-inactive" data-tab="settings-section"><span class="material-icons-outlined mr-2">settings</span>System Settings</button></li>
+<li class="w-full sm:w-auto"><button class="btn tab-inactive" data-tab="usage-limits-section"><span class="material-icons-outlined mr-2">bar_chart</span>Usage Limit</button></li>
+<li class="w-full sm:w-auto"><button class="btn tab-inactive" data-tab="docs-section"><span class="material-icons-outlined mr-2">description</span>API Documentation</button></li>
+<li class="w-full sm:w-auto"><button class="btn tab-inactive" data-tab="logs-section"><span class="material-icons-outlined mr-2">list_alt</span>Quizzes</button></li>
+</ul>
+</nav>
+
+<!-- Users & API Keys Section -->
+<div id="users-section" class="section-content">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 lg:gap-8">
+        <div class="card">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
+                <h3 class="text-lg sm:text-xl font-semibold text-gray-100">Users Management</h3>
+                <button class="btn btn-secondary text-sm w-full sm:w-auto refresh-btn" data-refresh="users">
+                    <span class="material-icons-outlined mr-1 text-base">refresh</span>Refresh
+                </button>
+            </div>
+            <div class="table-container">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Username</th>
+                            <th>Email</th>
+                            <th>Tier</th>
+                            <th>API Key</th>
+                            <th>Status</th>
+                            <th>Created At</th>
+                            <th>Updated At</th>
+                            <th>User ID</th>
+                        </tr>
+                    </thead>
+                    <tbody id="users-tbody"></tbody>
+                </table>
+            </div>
+        </div>
+        <div class="card">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
+                <h3 class="text-lg sm:text-xl font-semibold text-gray-100">API Keys Management</h3>
+                <button class="btn btn-secondary text-sm w-full sm:w-auto refresh-btn" data-refresh="api-keys">
+                    <span class="material-icons-outlined mr-1 text-base">refresh</span>Refresh
+                </button>
+            </div>
+            <div class="table-container">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>API Key</th>
+                            <th>User Type</th>
+                            <th>Status</th>
+                            <th>User ID</th>
+                        </tr>
+                    </thead>
+                    <tbody id="api-keys-tbody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- OpenRouter Management Section -->
+<div id="openrouter-section" class="section-content hidden">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 lg:gap-8">
+        <div class="card">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
+                <h3 class="text-lg sm:text-xl font-semibold text-gray-100">OpenRouter API Keys</h3>
+                <button class="btn btn-secondary text-sm w-full sm:w-auto refresh-btn" data-refresh="openrouter-keys">
+                    <span class="material-icons-outlined mr-1 text-base">refresh</span>Refresh
+                </button>
+            </div>
+            <!-- Create OpenRouter Key Form -->
+            <form id="openrouter-key-create-form" class="mb-4 grid grid-cols-1 sm:grid-cols-4 gap-2">
+                <input type="text" id="or-key-description" placeholder="Description" required class="rounded px-2 py-1 ul-editable-input" />
+                <input type="text" id="or-key-apikey" placeholder="API Key" required class="rounded px-2 py-1 ul-editable-input" />
+                <select id="or-key-default" class="rounded px-2 py-1 ul-editable-input">
+                    <option value="false">Not Default</option>
+                    <option value="true">Default</option>
+                </select>
+                <button type="submit" class="btn btn-primary col-span-1 sm:col-auto flex items-center justify-center"><span class="material-icons-outlined mr-1">add</span>Add</button>
+                <span id="or-key-create-status" class="col-span-1 sm:col-auto text-sm"></span>
+            </form>
+            <div class="table-container">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Description</th>
+                            <th>API Key</th>
+                            <th>Is Default</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="openrouter-keys-tbody"></tbody>
+                </table>
+            </div>
+        </div>
+        <div class="card">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
+                <h3 class="text-lg sm:text-xl font-semibold text-gray-100">API Models</h3>
+                <button class="btn btn-secondary text-sm w-full sm:w-auto refresh-btn" data-refresh="api-models">
+                    <span class="material-icons-outlined mr-1 text-base">refresh</span>Refresh
+                </button>
+            </div>
+            <!-- Create API Model Form -->
+            <form id="api-model-create-form" class="mb-4 grid grid-cols-1 sm:grid-cols-4 gap-2">
+                <input type="text" id="api-model-name" placeholder="Model Name" required class="rounded px-2 py-1 ul-editable-input" />
+                <input type="text" id="api-model-description" placeholder="Description" required class="rounded px-2 py-1 ul-editable-input" />
+                <select id="api-model-default" class="rounded px-2 py-1 ul-editable-input">
+                    <option value="false">Not Default</option>
+                    <option value="true">Default</option>
+                </select>
+                <button type="submit" class="btn btn-primary col-span-1 sm:col-auto flex items-center justify-center"><span class="material-icons-outlined mr-1">add</span>Add</button>
+                <span id="api-model-create-status" class="col-span-1 sm:col-auto text-sm"></span>
+            </form>
+            <div class="table-container">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Model Name</th>
+                            <th>Description</th>
+                            <th>Is Default</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="api-models-tbody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Placeholder sections for other tabs -->
+<div id="settings-section" class="section-content hidden">
+    <div class="card mb-6">
+        <h3 class="text-lg sm:text-xl font-semibold text-gray-100 mb-4">System Health Check</h3>
+        <button id="health-check-btn" class="btn btn-primary mb-4 flex items-center"><span class="material-icons-outlined mr-2">health_and_safety</span>Run Health Check</button>
+        <div id="health-check-loading" class="hidden flex flex-col items-center justify-center py-4">
+            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mb-2"></div>
+            <span class="text-gray-400">Running health checks...</span>
+        </div>
+        <div id="health-check-results" class="grid grid-cols-1 sm:grid-cols-2 gap-4"></div>
+    </div>
+    <div class="card mb-6">
+        <h3 class="text-lg sm:text-xl font-semibold text-gray-100 mb-4">Database Tables Health</h3>
+        <button id="db-tables-health-btn" class="btn btn-primary mb-4 flex items-center"><span class="material-icons-outlined mr-2">table_chart</span>Check All Tables</button>
+        <div id="db-tables-health-loading" class="hidden flex flex-col items-center justify-center py-4">
+            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mb-2"></div>
+            <span class="text-gray-400">Checking all tables...</span>
+        </div>
+        <div id="db-tables-health-results"></div>
+    </div>
+    <div class="card mb-6">
+        <h3 class="text-lg sm:text-xl font-semibold text-gray-100 mb-4">OpenRouter Prompt Complexity Health</h3>
+        <button id="openrouter-prompts-health-btn" class="btn btn-primary mb-4 flex items-center"><span class="material-icons-outlined mr-2">psychology</span>Check Prompt Latency</button>
+        <div id="openrouter-prompts-health-loading" class="hidden flex flex-col items-center justify-center py-4">
+            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mb-2"></div>
+            <span class="text-gray-400">Checking prompt latencies...</span>
+        </div>
+        <div id="openrouter-prompts-health-results"></div>
+    </div>
+    <div class="card">
+        <h3 class="text-lg sm:text-xl font-semibold text-gray-100 mb-4">Final Health Report</h3>
+        <div id="final-health-report"></div>
+    </div>
+</div>
+
+<div id="usage-limits-section" class="section-content hidden">
+    <div class="card">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
+            <h3 class="text-lg sm:text-xl font-semibold text-gray-100">Usage Limits</h3>
+            <button class="btn btn-secondary text-sm w-full sm:w-auto refresh-btn" data-refresh="usage-limits">
+                <span class="material-icons-outlined mr-1 text-base">refresh</span>Refresh
+            </button>
+        </div>
+        <!-- Create Usage Limit Form -->
+        <form id="usage-limit-create-form" class="mb-4 grid grid-cols-1 sm:grid-cols-6 gap-2">
+            <input type="text" id="ul-tier-name" placeholder="Tier Name" required class="rounded px-2 py-1 ul-editable-input" />
+            <input type="number" id="ul-daily" placeholder="Max Daily" required class="rounded px-2 py-1 ul-editable-input" />
+            <input type="number" id="ul-monthly" placeholder="Max Monthly" required class="rounded px-2 py-1 ul-editable-input" />
+            <input type="number" step="0.01" id="ul-price" placeholder="Price" required class="rounded px-2 py-1 ul-editable-input" />
+            <button type="submit" class="btn btn-primary col-span-1 sm:col-auto flex items-center justify-center"><span class="material-icons-outlined mr-1">add</span>Add</button>
+            <span id="ul-create-status" class="col-span-1 sm:col-auto text-sm"></span>
+        </form>
+        <div class="table-container">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Tier Name</th>
+                        <th>Max Daily Limit</th>
+                        <th>Max Monthly Limit</th>
+                        <th>Price</th>
+                        <th>Created At</th>
+                        <th>Updated At</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="usage-limits-tbody"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div id="docs-section" class="section-content hidden">
+    <div class="card">
+        <h3 class="text-lg sm:text-xl font-semibold text-gray-100">API Documentation</h3>
+        <p class="text-gray-400 mt-2">This section provides details on the API endpoints and how the quiz generation prompt selector works.</p>
+
+        <div class="mt-6">
+            <!-- API Endpoint Section -->
+            <div class="collapsible-section">
+                <div class="collapsible-header" onclick="toggleSection(this)">
+                    <h4 class="text-lg font-semibold text-gray-100">API Endpoint: <code>/generate-quiz</code></h4>
+                    <span class="material-icons-outlined collapsible-icon text-gray-400">expand_more</span>
+                </div>
+                <div class="collapsible-content">
+                    <div class="p-4">
+                        <p class="text-gray-400 mb-4">This endpoint is used to generate quizzes based on your specifications. It accepts a <strong>POST</strong> request with a JSON payload.</p>
+
+                        <h5 class="text-md font-semibold text-gray-100 mb-2">Request Format (Input)</h5>
+                        <p class="text-gray-400 mb-2">The request body should be a JSON object with the following parameters:</p>
+                        <pre><code class="language-json">{
+  "api_key": "your_openrouter_api_key",
+  "content_type": "topic" | "paragraph",
+  "question_type": "multiple_choice_quiz" | "true_false_quiz" | "fill_in_the_blanks_quiz",
+  "level": "easy" | "medium" | "hard",
+  "content": "Your topic or paragraph content here",
+  "num_of_question": 1 | 2 | 3 | 4 | 5, 
+  "subject": "Optional subject for the quiz",
+  "exam": "Optional reference exam name",
+  "custom_instruction": "Optional custom instructions for quiz generation"
+}</code></pre>
+                        <ul class="list-disc list-inside text-gray-300 space-y-2 mt-2">
+                            <li><code>api_key</code> (string, <strong>required</strong>): Your OpenRouter API key.</li>
+                            <li><code>content_type</code> (string, <strong>required</strong>): Specifies whether the quiz is based on a "topic" or a "paragraph".</li>
+                            <li><code>question_type</code> (string, <strong>required</strong>): The type of quiz to generate. Choose from "multiple_choice_quiz", "true_false_quiz", or "fill_in_the_blanks_quiz".</li>
+                            <li><code>level</code> (string, <strong>required</strong>): The difficulty level of the quiz. Options are "easy", "medium", or "hard".</li>
+                            <li><code>content</code> (string, <strong>required</strong>): The actual content (topic or paragraph) for which the quiz will be generated.</li>
+                            <li><code>num_of_question</code> (integer, <strong>required</strong>): The number of questions to generate (between 1 and 5).</li>
+                            <li><code>subject</code> (string, optional): An optional subject for the quiz, e.g., "History", "Science".</li>
+                            <li><code>exam</code> (string, optional): An optional reference exam name, e.g., "Midterm Exam", "Unit 1 Test".</li>
+                            <li><code>custom_instruction</code> (string, optional): Any additional custom instructions for the quiz generation, e.g., "Focus on dates", "Include explanations for wrong answers".</li>
+                        </ul>
+
+                        <h5 class="text-md font-semibold text-gray-100 mb-2 mt-6">Response Format (Output)</h5>
+                        <p class="text-gray-400 mb-2">The API will return a JSON object containing the generated quiz content. The <code>quiz_content</code> field will be a JSON string that needs to be parsed separately. This design allows for flexibility in the quiz structure while maintaining a consistent API response envelope.</p>
+                        <pre><code class="language-json">{
+  "message": "Quiz generated successfully!",
+  "quiz_content": "{\"context\":\"Here are 3 questions on the topic: Quantum Physics with medium difficulty.\",\"topic\":\"Quantum Physics\",\"exam\":\"\",\"level\":\"medium\",\"questions\":[{\"stem\":\"Which of the following describes the behavior of particles at the quantum level?\",\"options\":[\"Classical mechanics\",\"Quantum mechanics\",\"Thermodynamics\",\"Electromagnetism\"],\"correct_option\":\"Quantum mechanics\",\"explanation\":\"Quantum mechanics is the branch of physics that deals with the behavior of matter and light on an atomic and subatomic level.\"}]}"
+}</code></pre>
+                        <p class="text-gray-400 mb-2 mt-4"><strong>Understanding the <code>quiz_content</code>:</strong></p>
+                        <ul class="list-disc list-inside text-gray-300 space-y-2">
+                            <li>The outer JSON object contains a <code>message</code> and <code>quiz_content</code>.</li>
+                            <li><code>quiz_content</code> is a <strong>JSON string</strong>. This means it's a string that *looks* like a JSON object but needs to be parsed again on the frontend to be used as a JavaScript object.</li>
+                            <li>The structure of the inner <code>quiz_content</code> (after parsing) depends on the <code>question_type</code> requested. Examples for each type are provided in the "Quiz Generation Prompts (Internal)" section below.</li>
+                        </ul>
+
+                        <h5 class="text-md font-semibold text-gray-100 mb-2 mt-6">Possible Response Scenarios:</h5>
+                        <p class="text-gray-400 mb-2">The backend can return different types of responses depending on the outcome of the request:</p>
+                        <ul class="list-disc list-inside text-gray-300 space-y-2">
+                            <li><strong>Success (HTTP 200 OK):</strong>
+                                <p class="text-gray-400">When the quiz is generated successfully, you will receive a response like the example above, with <code>message: "Quiz generated successfully!"</code> and the <code>quiz_content</code> string.</p>
+                            </li>
+                            <li><strong>Validation Error (HTTP 422 Unprocessable Entity):</strong>
+                                <p class="text-gray-400">If any required parameters are missing or invalid (e.g., <code>num_of_question</code> is not between 1 and 5), the API will return a 422 status code with details about the error.</p>
+                                <pre><code class="language-json">{
+  "detail": [
+    {
+      "loc": ["body", "num_of_question"],
+      "msg": "value is not a valid enumeration member; permitted: 1, 2, 3, 4, 5",
+      "type": "type_error.enum"
+    }
+  ]
+}</code></pre>
+                            </li>
+                            <li><strong>Authentication/Authorization Error (HTTP 401 Unauthorized / 403 Forbidden):</strong>
+                                <p class="text-gray-400">If the <code>api_key</code> is missing, invalid, or unauthorized, you might receive a 401 or 403 status code.</p>
+                                <pre><code class="language-json">{
+  "detail": "Invalid API Key"
+}</code></pre>
+                            </li>
+                            <li><strong>Internal Server Error (HTTP 500 Internal Server Error):</strong>
+                                <p class="text-gray-400">For unexpected errors on the server side, a 500 status code will be returned. This is less common and indicates a problem with the backend itself.</p>
+                                <pre><code class="language-json">{
+  "detail": "Internal Server Error"
+}</code></pre>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Example JavaScript Usage Section -->
+            <div class="collapsible-section">
+                <div class="collapsible-header" onclick="toggleSection(this)">
+                    <h4 class="text-lg font-semibold text-gray-100">Example JavaScript Usage</h4>
+                    <span class="material-icons-outlined collapsible-icon text-gray-400">expand_more</span>
+                </div>
+                <div class="collapsible-content">
+                    <div class="p-4">
+                        <p class="text-gray-400 mb-2">Here's how you might call the API from a JavaScript frontend and handle different response types:</p>
+                        <pre><code class="language-javascript">
+async function generateQuiz() {
+  const apiUrl = 'http://localhost:8000/generate-quiz'; // Replace with your backend URL
+  const apiKey = 'YOUR_OPENROUTER_API_KEY'; // Replace with your actual API key
+
+  const requestBody = {
+    api_key: apiKey,
+    content_type: 'topic',
+    question_type: 'multiple_choice_quiz',
+    level: 'medium',
+    content: 'Quantum Physics',
+    num_of_question: 3,
+    subject: 'Physics',
+    custom_instruction: 'Include a mix of conceptual and factual questions.'
+  };
+
+  try {
+    const response = await fetch(apiUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(requestBody)
+    });
+
+    // Check if the response was successful (status code 2xx)
+    if (response.ok) {
+      const data = await response.json();
+      console.log('Raw API Response (Success):', data);
+
+      // IMPORTANT: Parse the quiz_content string as it's a JSON string embedded within the response
+      try {
+        const quizContent = JSON.parse(data.quiz_content);
+        console.log('Parsed Quiz Content:', quizContent);
+        // Now you can work with the quizContent object to display the quiz
+        alert('Quiz generated successfully! Check console for details.');
+      } catch (parseError) {
+        console.error('Error parsing quiz_content:', parseError);
+        alert('Error: Could not parse quiz content from response.');
+      }
+
+    } else {
+      // Handle error responses (status code 4xx or 5xx)
+      const errorData = await response.json();
+      console.error('API Error Response:', errorData);
+
+      let errorMessage = 'Failed to generate quiz.';
+      if (response.status === 422 && errorData.detail) {
+        // Validation errors often have a 'detail' array
+        errorMessage = 'Validation Error: ' + errorData.detail.map(err => err.msg).join(', ');
+      } else if (errorData.detail) {
+        // Other errors might have a 'detail' string
+        errorMessage = 'Error: ' + errorData.detail;
+      } else if (errorData.message) {
+        // Some errors might use a 'message' field
+        errorMessage = 'Error: ' + errorData.message;
+      }
+      alert(errorMessage);
+    }
+
+  } catch (networkError) {
+    // Handle network-related errors (e.g., server unreachable)
+    console.error('Network Error:', networkError);
+    alert('Network error: Could not connect to the backend. Please check your internet connection or the server status.');
+  }
+}
+
+// Call the function to generate a quiz
+generateQuiz();
+</code></pre>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quiz Generation Prompts Section -->
+            <div class="collapsible-section">
+                <div class="collapsible-header" onclick="toggleSection(this)">
+                    <h4 class="text-lg font-semibold text-gray-100">Quiz Generation Prompts (Internal)</h4>
+                    <span class="material-icons-outlined collapsible-icon text-gray-400">expand_more</span>
+                </div>
+                <div class="collapsible-content">
+                    <div class="p-4">
+                        <p class="text-gray-400 mb-4">The system uses predefined prompt templates for quiz generation based on the content type (topic or paragraph) and question type (multiple-choice, true/false, or fill-in-the-blanks). Below are the 6 available prompt templates:</p>
+                        <ul class="list-disc list-inside text-gray-300 space-y-2">
+                            <li><strong>Topic - Multiple Choice:</strong> You are an expert educational content generator. Create {num_of_question} unique and creatively framed multiple-choice questions that comprehensively assess understanding of the topic: "{content}". Ensure the questions vary in style—some direct, some conceptual, and some application-based—while maintaining the specified difficulty level: {level}. {subject_instruction} {exam_instruction} {custom_instruction}. Return the output strictly in this JSON format:
+<pre><code class="language-json">{
+  "context": "Here are {num_of_question} questions on the topic: {content} with {level} difficulty.",
+  "topic": "{content}",
+  "exam": "{exam_instruction}",
+  "level": "{level}",
+  "questions": [
+    {
+      "stem": "Question text",
+      "options": ["Option A", "Option B", "Option C", "Option D"],
+      "correct_option": "Option A",
+      "explanation": "Brief explanation of the correct answer."
+    }
+  ]
+}</code></pre></li>
+                            <li><strong>Topic - True/False:</strong> You are an expert test designer. Generate **{num_of_question} well-balanced and logically challenging true/false questions** about the topic: **"{content}"**, ensuring a mix of facts, misconceptions, and analytical judgments at **{level}** difficulty. {subject_instruction} {exam_instruction} {custom_instruction}
+
+Return the output strictly in this JSON format:
+<pre><code class="language-json">{
+  "context": "Here are {num_of_question} questions on the topic: {content} with {level} difficulty.",
+  "topic": "{content}",
+  "exam": "{exam_instruction}",
+  "level": "{level}",
+  "questions": [
+    {
+      "stem": "Statement text",
+      "correct_option": true,
+      "explanation": "Brief reasoning behind the true or false answer."
+    }
+  ]
+}</code></pre></li>
+                            <li><strong>Topic - Fill-in-the-Blanks:</strong> You are a creative academic assistant. Create **{num_of_question} thought-provoking fill-in-the-blank questions** on the topic: **"{content}"**, using intelligent omissions that assess conceptual understanding. Maintain a consistent tone and ensure a suitable difficulty level: {level}. {subject_instruction} {exam_instruction} {custom_instruction}
+
+Use **underscores (___)** to indicate blanks. Return the output strictly in this JSON format:
+<pre><code class="language-json">{
+  "context": "Here are {num_of_question} questions on the topic: {content} with {level} difficulty.",
+  "topic": "{content}",
+  "exam": "{exam_instruction}",
+  "level": "{level}",
+  "questions": [
+    {
+      "stem": "The capital of France is ___",
+      "options": ["Paris", "Berlin", "Rome", "Madrid"],
+      "correct_option": "Paris",
+      "explanation": "Paris is the capital of France."
+    }
+  ]
+}</code></pre></li>
+                            <li><strong>Paragraph - Multiple Choice:</strong> You are a quiz master AI. Carefully analyze the following paragraph and generate **{num_of_question} insightful and well-reasoned multiple-choice questions** to evaluate comprehension, inference, and critical analysis at **{level}** difficulty:
+
+"{content}"
+
+Incorporate diversity in questioning styles—factual recall, implications, author intent, etc. {subject_instruction} {exam_instruction} {custom_instruction}
+
+Return the output strictly in this JSON format:
+<pre><code class="language-json">{
+  "context": "Here are {num_of_question} questions derived from the paragraph with {level} difficulty.",
+  "topic": "Derived from paragraph",
+  "exam": "{exam_instruction}",
+  "level": "{level}",
+  "questions": [
+    {
+      "stem": "Question based on paragraph",
+      "options": ["Option A", "Option B", "Option C", "Option D"],
+      "correct_option": "Option B",
+      "explanation": "Explanation based on paragraph analysis."
+    }
+  ]
+}</code></pre></li>
+                            <li><strong>Paragraph - True/False:</strong> Read the following paragraph and generate **{num_of_question} well-reasoned true/false statements** that require understanding of both explicit and implicit content. The goal is to test critical reading and comprehension skills at **{level}** difficulty:
+
+"{content}"
+
+Ensure a balanced distribution of true and false answers. {subject_instruction} {exam_instruction} {custom_instruction}
+
+Return the output strictly in this JSON format:
+<pre><code class="language-json">{
+  "context": "Here are {num_of_question} questions derived from the paragraph with {level} difficulty.",
+  "topic": "Derived from paragraph",
+  "exam": "{exam_instruction}",
+  "level": "{level}",
+  "questions": [
+    {
+      "stem": "Statement derived from paragraph",
+      "correct_option": false,
+      "explanation": "Explain why it is false."
+    }
+  ]
+}</code></pre></li>
+                            <li><strong>Paragraph - Fill-in-the-Blanks:</strong> From the following paragraph, craft **{num_of_question} intelligent fill-in-the-blank questions** that test key facts, concepts, or contextually significant words. Use meaningful omissions and ensure a consistent tone across all questions. Target difficulty: **{level}**.
+
+"{content}"
+
+{subject_instruction} {exam_instruction} {custom_instruction}
+
+Use **___** for blanks. Return the output strictly in this JSON format:
+<pre><code class="language-json">{
+  "context": "Here are {num_of_question} questions derived from the paragraph with {level} difficulty.",
+  
+  "topic": "Derived from paragraph",
+  "exam": "{exam_instruction}",
+  "level": "{level}",
+  "questions": [
+    {
+      "stem": "The author argues that ___ is essential.",
+      "options": ["freedom", "discipline", "order", "equality"],
+      "correct_option": "freedom",
+      "explanation": "Explanation based on paragraph logic."
+    }
+  ]
+}</code></pre></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- How the Prompt Selector Works Section -->
+            <div class="collapsible-section">
+                <div class="collapsible-header" onclick="toggleSection(this)">
+                    <h4 class="text-lg font-semibold text-gray-100">How the Prompt Selector Works</h4>
+                    <span class="material-icons-outlined collapsible-icon text-gray-400">expand_more</span>
+                </div>
+                <div class="collapsible-content">
+                    <div class="p-4">
+                        <p class="text-gray-400 mb-4">The <code>prompt_selector.py</code> module dynamically selects and customizes a prompt based on the parameters provided by the user for quiz generation. Here's a detailed explanation:</p>
+                        <ol class="list-decimal list-inside text-gray-300 space-y-2">
+                            <li><strong>Input Parameters:</strong> The <code>select_and_customize_prompt</code> function receives a dictionary of parameters, including <code>content_type</code> (e.g., "topic", "paragraph"), <code>question_type</code> (e.g., "multiple_choice_quiz", "true_false_quiz", "fill_in_the_blanks_quiz"), <code>level</code>, <code>content</code>, <code>num_of_question</code>, and optional parameters like <code>subject</code>, <code>refrence exam</code>, and <code>custom instruction</code>.</li>
+                            <li><strong>Mandatory Parameter Validation:</strong> The function first validates that all mandatory parameters (<code>content_type</code>, <code>question_type</code>, <code>level</code>, <code>content</code>, <code>num_of_question</code>) are provided. If any are missing, it indicates an error.</li>
+                            <li><strong>Question Type Mapping:</strong> It maps the frontend <code>question_type</code> names (e.g., "multiple_choice_quiz") to the internal keys used in the <code>PREDEFINED_PROMPTS</code> dictionary (e.g., "mcq"). This ensures consistency between the UI and the backend prompt definitions.</li>
+                            <li><strong>Prompt Key Construction:</strong> A unique prompt key is constructed using the lowercased <code>content_type</code> and the mapped <code>question_type</code> (e.g., <code>("topic", "mcq")</code>).</li>
+                            <li><strong>Base Prompt Retrieval:</strong> The function then retrieves the corresponding base prompt template from the <code>PREDEFINED_PROMPTS</code> dictionary using the constructed key. If no matching prompt is found, it handles the unsupported combination.</li>
+                            <li><strong>Optional Instruction Building:</strong> It dynamically builds optional instruction strings for <code>subject</code>, <code>refrence exam</code>, and <code>custom instruction</code> if these parameters are provided.</li>
+                            <li><strong>Prompt Formatting:</strong> Finally, the selected base prompt is formatted by replacing placeholders (e.g., <code>{content}</code>, <code>{level}</code>, <code>{num_of_question}</code>, <code>{subject_instruction}</code>, <code>{exam_instruction}</code>, <code>{custom_instruction}</code>) with their actual values from the input parameters.</li>
+                            <li><strong>Output:</strong> The function returns the fully customized prompt string, ready to be used for quiz generation.</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Usage Logs Section -->
+<div id="logs-section" class="section-content hidden">
+    <div class="card">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
+            <h3 class="text-lg sm:text-xl font-semibold text-gray-100">Generated Quizzes</h3>
+            <button class="btn btn-secondary text-sm w-full sm:w-auto refresh-btn" data-refresh="generated-quizzes">
+                <span class="material-icons-outlined mr-1 text-base">refresh</span>Refresh
+            </button>
+            </div>
+        <div class="table-container">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Generated At</th>
+                        <th>User API Key</th>
+                        <th>Quiz Content</th>
+                    </tr>
+                </thead>
+                <tbody id="generated-quizzes-tbody"></tbody>
+            </table>
+        </div>
+        </div>
+    </div>
+</div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Debug flag
+        const DEBUG = true;
+
+        // API base URL
+        const API_BASE_URL = 'http://localhost:8000';
+
+        // Data cache
+        const dataCache = {
+            users: null,
+            apiKeys: null,
+            openrouterKeys: null,
+            apiModels: null,
+            generatedQuizzes: null,
+            dashboardStats: null
+        };
+
+        // Debug logging function
+        function debugLog(...args) {
+            if (DEBUG) {
+                // Only log generic messages, not actual data
+                if (args.length > 1 && typeof args[1] === 'object' && args[0].includes('data received')) {
+                    console.log('[Admin Debug]', args[0].replace(/ data received:.*/, ' data fetch successful'));
+                } else if (args[0].includes('Making API request to:')) {
+                    console.log('[Admin Debug]', 'Making API request to: [API endpoint]');
+                } else {
+                    console.log('[Admin Debug]', ...args);
+                }
+            }
+        }
+
+        // Loading animation HTML
+        const loadingHTML = `
+            <tr>
+                <td colspan="5" class="text-center py-8">
+                    <div class="flex flex-col items-center justify-center">
+                        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mb-2"></div>
+                        <span class="text-gray-400">Loading data...</span>
+                    </div>
+                        </td>
+                    </tr>
+                `;
+
+        // Function to show loading state
+        function showLoading(tableBody) {
+            tableBody.innerHTML = loadingHTML;
+        }
+
+        // Function to show error state
+        function showError(tableBody, message) {
+            tableBody.innerHTML = `
+                <tr>
+                    <td colspan="5" class="text-center py-8">
+                        <div class="flex flex-col items-center justify-center">
+                            <span class="material-icons-outlined text-red-500 text-4xl mb-2">error_outline</span>
+                            <span class="text-red-400">${message}</span>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+        }
+
+        // Function to make API requests
+        async function apiRequest(endpoint) {
+            const url = `${API_BASE_URL}${endpoint}`;
+            debugLog(`Making API request to: ${url}`);
+            const response = await fetch(url);
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(`API request failed: ${errorText}`);
+            }
+            return response.json();
+        }
+
+        // Copy to clipboard functionality
+        const adminPasswordText = document.getElementById('admin-password-text');
+        const copyAdminPasswordBtn = document.getElementById('copy-admin-password');
+
+        if (copyAdminPasswordBtn && adminPasswordText) {
+            copyAdminPasswordBtn.addEventListener('click', async () => {
+                try {
+                    await navigator.clipboard.writeText(adminPasswordText.textContent);
+                    copyAdminPasswordBtn.innerHTML = '<span class="material-icons-outlined text-sm">check</span>';
+                    setTimeout(() => {
+                        copyAdminPasswordBtn.innerHTML = '<span class="material-icons-outlined text-sm">content_copy</span>';
+                    }, 2000);
+                } catch (err) {
+                    console.error('Failed to copy text: ', err);
+                }
+            });
+        }
+
+        // Function to update dashboard stats
+        async function updateDashboardStats(forceRefresh = false) {
+            if (!forceRefresh && dataCache.dashboardStats) {
+                return dataCache.dashboardStats;
+            }
+
+            try {
+                debugLog('Fetching dashboard stats...');
+                const stats = await apiRequest('/api/admin/dashboard-stats');
+                debugLog('Dashboard stats received:', stats);
+                
+                // Update the stats in the dashboard cards
+                document.querySelector('.card:nth-child(1) p:nth-child(2)').textContent = stats.data.total_users;
+                document.querySelector('.card:nth-child(2) p:nth-child(2)').textContent = stats.data.active_api_keys;
+                document.querySelector('.card:nth-child(3) p:nth-child(2)').textContent = stats.data.total_quizzes;
+                document.querySelector('.card:nth-child(4) p:nth-child(2)').textContent = stats.data.total_openrouter_keys;
+
+                dataCache.dashboardStats = stats;
+                return stats;
+            } catch (error) {
+                console.error('Error fetching dashboard stats:', error);
+                // Show error in the first card
+                document.querySelector('.card:nth-child(1) p:nth-child(2)').textContent = 'Error';
+                document.querySelector('.card:nth-child(1) p:nth-child(3)').textContent = 'Failed to load stats';
+                throw error;
+            }
+        }
+
+        // Helper to show loading and update count for a card
+        function showCardLoading(card) {
+            document.getElementById(card + '-count').classList.add('hidden');
+            document.getElementById(card + '-count-loading').classList.remove('hidden');
+        }
+        function showCardCount(card, count) {
+            document.getElementById(card + '-count').textContent = count;
+            document.getElementById(card + '-count').classList.remove('hidden');
+            document.getElementById(card + '-count-loading').classList.add('hidden');
+        }
+        // Helper to count data rows in a table (excluding 'no data' and error rows)
+        function countDataRows(tbodyId) {
+            const tbody = document.getElementById(tbodyId);
+            if (!tbody) return 0;
+            // Only count rows that do not have colspan (which are used for 'no data' or error messages)
+            return Array.from(tbody.children).filter(tr => !tr.querySelector('[colspan]')).length;
+        }
+
+        // Initial Data Load Timer Logic
+        const initialLoadStart = performance.now();
+        let initialLoadFetches = 0;
+        const initialLoadTotal = 6;
+        const box = document.getElementById('initial-load-timer-box');
+        const text = document.getElementById('initial-load-timer-text');
+        let initialLoadTimerInterval = null;
+        function startInitialLoadTimer() {
+            box.classList.remove('hidden');
+            initialLoadTimerInterval = setInterval(() => {
+                const elapsed = performance.now() - initialLoadStart;
+                text.textContent = `Initial Data Load Time: ${elapsed.toFixed(0)} ms`;
+            }, 50);
+        }
+        function stopInitialLoadTimer() {
+            if (initialLoadTimerInterval) clearInterval(initialLoadTimerInterval);
+            const elapsed = performance.now() - initialLoadStart;
+            text.textContent = `Initial Data Load Time: ${elapsed.toFixed(0)} ms`;
+        }
+        function markInitialLoadFetch() {
+            initialLoadFetches++;
+            if (initialLoadFetches === initialLoadTotal) {
+                stopInitialLoadTimer();
+            }
+        }
+        // Start the timer as soon as script runs
+        startInitialLoadTimer();
+
+        // Update Users count
+        async function fetchUsers(forceRefresh = false) {
+            showCardLoading('users');
+            if (!forceRefresh && dataCache.users) {
+                renderUsersTable(dataCache.users.data);
+                markInitialLoadFetch();
+                return dataCache.users;
+            }
+            const usersTableBody = document.getElementById('users-tbody');
+            showLoading(usersTableBody);
+            try {
+                debugLog('Fetching users from USERS table...');
+                const result = await apiRequest('/api/admin/users');
+                debugLog('Users data received:', result);
+                renderUsersTable(result.data);
+                dataCache.users = result;
+                markInitialLoadFetch();
+                return result;
+            } catch (error) {
+                console.error('Error fetching users:', error);
+                showError(usersTableBody, `Failed to load users: ${error.message}`);
+                showCardCount('users', 0);
+                markInitialLoadFetch();
+                throw error;
+            }
+        }
+        function renderUsersTable(data) {
+            const usersTableBody = document.getElementById('users-tbody');
+            if (!data || data.length === 0) {
+                usersTableBody.innerHTML = `
+                    <tr>
+                        <td colspan="8" class="text-center py-8 text-gray-400">No users found</td>
+                    </tr>
+                `;
+            } else {
+                usersTableBody.innerHTML = data.map(user => `
+                    <tr>
+                        <td class="text-gray-200">${user.username || 'N/A'}</td>
+                        <td class="text-gray-300">${user.email || 'N/A'}</td>
+                        <td class="text-gray-300">${user.tier || 'N/A'}</td>
+                        <td class="text-gray-300 font-mono">${user.api_key || 'N/A'}</td>
+                        <td><span class="status-active">${user.is_active ? 'Active' : 'Inactive'}</span></td>
+                        <td class="text-gray-400">${new Date(user.created_at).toLocaleString()}</td>
+                        <td class="text-gray-400">${user.updated_at ? new Date(user.updated_at).toLocaleString() : 'N/A'}</td>
+                        <td class="text-gray-400">${user.user_id || 'N/A'}</td>
+                    </tr>
+                `).join('');
+            }
+            showCardCount('users', countDataRows('users-tbody'));
+        }
+
+        // Function to fetch and display API keys from USER_API_KEYS table
+        async function fetchApiKeys(forceRefresh = false) {
+            if (!forceRefresh && dataCache.apiKeys) {
+                renderApiKeysTable(dataCache.apiKeys.data);
+                markInitialLoadFetch();
+                return dataCache.apiKeys;
+            }
+            const apiKeysTableBody = document.getElementById('api-keys-tbody');
+            showLoading(apiKeysTableBody);
+            try {
+                debugLog('Fetching API keys from USER_API_KEYS table...');
+                const result = await apiRequest('/api/admin/api-keys');
+                debugLog('API keys data received:', result);
+                renderApiKeysTable(result.data);
+                dataCache.apiKeys = result;
+                markInitialLoadFetch();
+                return result;
+            } catch (error) {
+                console.error('Error fetching API keys:', error);
+                showError(apiKeysTableBody, `Failed to load API keys: ${error.message}`);
+                markInitialLoadFetch();
+                throw error;
+            }
+        }
+        function renderApiKeysTable(data) {
+            const apiKeysTableBody = document.getElementById('api-keys-tbody');
+            if (!data || data.length === 0) {
+                apiKeysTableBody.innerHTML = `
+                    <tr>
+                        <td colspan="4" class="text-center py-8 text-gray-400">No API keys found</td>
+                    </tr>
+                `;
+            } else {
+                apiKeysTableBody.innerHTML = data.map(key => `
+                    <tr>
+                        <td class="text-gray-200 font-mono">${key.user_api_key || 'N/A'}</td>
+                        <td class="text-gray-300">${key.user_type || 'N/A'}</td>
+                        <td><span class="status-active">${key.status || 'N/A'}</span></td>
+                        <td class="text-gray-400">${key.user_id || 'N/A'}</td>
+                    </tr>
+                `).join('');
+            }
+        }
+
+        // Function to fetch and display OpenRouter API keys from OPENROUTER_API_KEYS table
+        async function fetchOpenRouterKeys(forceRefresh = false) {
+            showCardLoading('openrouter');
+            if (!forceRefresh && dataCache.openrouterKeys) {
+                renderOpenRouterKeysTable(dataCache.openrouterKeys.data);
+                attachOpenRouterKeyRowHandlers(); // Add this line to attach handlers after rendering
+                markInitialLoadFetch();
+                return dataCache.openrouterKeys;
+            }
+            const openrouterKeysTableBody = document.getElementById('openrouter-keys-tbody');
+            showLoading(openrouterKeysTableBody);
+            try {
+                debugLog('Fetching OpenRouter keys from OPENROUTER_API_KEYS table...');
+                const result = await apiRequest('/api/admin/openrouter-keys');
+                debugLog('OpenRouter keys data received:', result);
+                renderOpenRouterKeysTable(result.data);
+                attachOpenRouterKeyRowHandlers(); // Add this line to attach handlers after rendering
+                dataCache.openrouterKeys = result;
+                markInitialLoadFetch();
+                return result;
+            } catch (error) {
+                console.error('Error fetching OpenRouter keys:', error);
+                showError(openrouterKeysTableBody, `Failed to load OpenRouter API keys: ${error.message}`);
+                showCardCount('openrouter', 0);
+                markInitialLoadFetch();
+                throw error;
+            }
+        }
+        function renderOpenRouterKeysTable(data) {
+            const openrouterKeysTableBody = document.getElementById('openrouter-keys-tbody');
+            if (!data || data.length === 0) {
+                openrouterKeysTableBody.innerHTML = `<tr><td colspan="4" class="text-center py-8 text-gray-400">No OpenRouter API keys found</td></tr>`;
+            } else {
+                openrouterKeysTableBody.innerHTML = data.map(key => `
+                    <tr data-id="${key.id}">
+                        <td><span class="or-key-description">${key.description || 'N/A'}</span></td>
+                        <td><span class="or-key-apikey">${key.api_key ? '••••••••••••••••' : 'N/A'}</span></td>
+                        <td>${key.is_default ? '<span class="material-icons-outlined text-green-400">check_circle</span>' : '<span class="material-icons-outlined text-gray-400">radio_button_unchecked</span>'}</td>
+                        <td>
+                            <button class="btn btn-secondary btn-xs or-key-edit" data-id="${key.id}"><span class="material-icons-outlined text-base">edit</span></button>
+                            <button class="btn btn-secondary btn-xs or-key-delete ml-1" data-id="${key.id}"><span class="material-icons-outlined text-base">delete</span></button>
+                        </td>
+                    </tr>
+                `).join('');
+            }
+            attachOpenRouterKeyRowHandlers();
+            showCardCount('openrouter', countDataRows('openrouter-keys-tbody'));
+        }
+
+        function attachOpenRouterKeyRowHandlers() {
+            // Edit button handlers
+            document.querySelectorAll('#openrouter-keys-tbody .or-key-edit').forEach(btn => {
+                btn.onclick = function() {
+                    const tr = btn.closest('tr');
+                    if (!tr || tr.classList.contains('editing')) return;
+                    
+                    const id = btn.getAttribute('data-id'); // Get ID from button instead of tr
+                    const description = tr.querySelector('.or-key-description').textContent;
+                    const is_default = tr.querySelector('.material-icons-outlined').classList.contains('text-green-400');
+
+                    tr.classList.add('editing');
+                    tr.innerHTML = `
+                        <td><input type="text" value="${description}" class="rounded px-2 py-1 ul-editable-input or-edit-description" /></td>
+                        <td><input type="text" placeholder="Enter new API Key or leave blank to keep" class="rounded px-2 py-1 ul-editable-input or-edit-apikey" /></td>
+                        <td>
+                            <select class="rounded px-2 py-1 ul-editable-input or-edit-default">
+                                <option value="false" ${!is_default ? 'selected' : ''}>Not Default</option>
+                                <option value="true" ${is_default ? 'selected' : ''}>Default</option>
+                            </select>
+                        </td>
+                        <td>
+                            <button class="btn btn-primary btn-xs or-save" data-id="${id}"><span class="material-icons-outlined text-base">check</span></button>
+                            <button class="btn btn-secondary btn-xs or-cancel ml-1"><span class="material-icons-outlined text-base">close</span></button>
+                        </td>
+                    `;
+
+                    // Save button handler
+                    tr.querySelector('.or-save').onclick = async function() {
+                        const id = this.getAttribute('data-id'); // Get ID from save button
+                        const description = tr.querySelector('.or-edit-description').value.trim();
+                        const api_key = tr.querySelector('.or-edit-apikey').value.trim();
+                        const is_default = tr.querySelector('.or-edit-default').value === 'true';
+
+                        if (!description) {
+                            alert('Please enter a description');
+                            return;
+                        }
+
+                        tr.querySelector('.or-save').disabled = true;
+                        try {
+                            const body = { description, is_default };
+                            if (api_key) body.api_key = api_key;
+
+                            const resp = await fetch(`${API_BASE_URL}/api/admin/openrouter-keys/${id}`, {
+                                method: 'PUT',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify(body)
+                            });
+                            if (!resp.ok) throw new Error(await resp.text());
+                            await fetchOpenRouterKeys(true);
+                        } catch (err) {
+                            alert('Update failed: ' + err.message);
+                            tr.querySelector('.or-save').disabled = false;
+                        }
+                    };
+
+                    // Cancel button handler
+                    tr.querySelector('.or-cancel').onclick = function() {
+                        fetchOpenRouterKeys(true);
+                    };
+                };
+            });
+
+            // Delete button handlers
+            document.querySelectorAll('#openrouter-keys-tbody .or-key-delete').forEach(btn => {
+                btn.onclick = async function() {
+                    const id = btn.getAttribute('data-id'); // Get ID from button
+                    if (!confirm('Are you sure you want to delete this OpenRouter API key?')) return;
+                    
+                    btn.disabled = true;
+                    try {
+                        const resp = await fetch(`${API_BASE_URL}/api/admin/openrouter-keys/${id}`, { 
+                            method: 'DELETE' 
+                        });
+                        if (!resp.ok) throw new Error(await resp.text());
+                        await fetchOpenRouterKeys(true);
+                    } catch (err) {
+                        alert('Delete failed: ' + err.message);
+                        btn.disabled = false;
+                    }
+                };
+            });
+        }
+
+        // Function to fetch and display API models from MODELS table
+        async function fetchApiModels(forceRefresh = false) {
+            showCardLoading('models');
+            if (!forceRefresh && dataCache.apiModels) {
+                renderApiModelsTable(dataCache.apiModels.data);
+                markInitialLoadFetch();
+                return dataCache.apiModels;
+            }
+            const apiModelsTableBody = document.getElementById('api-models-tbody');
+            showLoading(apiModelsTableBody);
+            try {
+                debugLog('Fetching API models from MODELS table...');
+                const result = await apiRequest('/api/admin/api-models');
+                debugLog('API models data received:', result);
+                renderApiModelsTable(result.data);
+                dataCache.apiModels = result;
+                markInitialLoadFetch();
+                return result;
+            } catch (error) {
+                console.error('Error fetching API models:', error);
+                showError(apiModelsTableBody, `Failed to load API models: ${error.message}`);
+                showCardCount('models', 0);
+                markInitialLoadFetch();
+                throw error;
+            }
+        }
+        function renderApiModelsTable(data) {
+            const apiModelsTableBody = document.getElementById('api-models-tbody');
+            if (!data || data.length === 0) {
+                apiModelsTableBody.innerHTML = `<tr><td colspan="4" class="text-center py-8 text-gray-400">No API models found</td></tr>`;
+            } else {
+                apiModelsTableBody.innerHTML = data.map(model => `
+                    <tr data-id="${model.id}">
+                        <td><span class="am-model-name">${model.model_name || 'N/A'}</span></td>
+                        <td><span class="am-model-description">${model.description || 'N/A'}</span></td>
+                        <td>${model.is_default ? '<span class="material-icons-outlined text-green-400">check_circle</span>' : '<span class="material-icons-outlined text-gray-400">radio_button_unchecked</span>'}</td>
+                        <td>
+                            <button class="btn btn-secondary btn-xs am-edit" data-id="${model.id}"><span class="material-icons-outlined text-base">edit</span></button>
+                            <button class="btn btn-secondary btn-xs am-delete ml-1" data-id="${model.id}"><span class="material-icons-outlined text-base">delete</span></button>
+                        </td>
+                    </tr>
+                `).join('');
+            }
+            attachApiModelRowHandlers();
+            showCardCount('models', countDataRows('api-models-tbody'));
+        }
+
+        function attachApiModelRowHandlers() {
+            // Edit button handlers
+            document.querySelectorAll('#api-models-tbody .am-edit').forEach(btn => {
+                btn.onclick = function() {
+                    const tr = btn.closest('tr');
+                    if (!tr || tr.classList.contains('editing')) return;
+                    
+                    const id = btn.getAttribute('data-id'); // Get ID from button
+                    const model_name = tr.querySelector('.am-model-name').textContent;
+                    const description = tr.querySelector('.am-model-description').textContent;
+                    const is_default = tr.querySelector('.material-icons-outlined').classList.contains('text-green-400');
+
+                    tr.classList.add('editing');
+                    tr.innerHTML = `
+                        <td><input type="text" value="${model_name}" class="rounded px-2 py-1 ul-editable-input am-edit-name" /></td>
+                        <td><input type="text" value="${description}" class="rounded px-2 py-1 ul-editable-input am-edit-description" /></td>
+                        <td>
+                            <select class="rounded px-2 py-1 ul-editable-input am-edit-default">
+                                <option value="false" ${!is_default ? 'selected' : ''}>Not Default</option>
+                                <option value="true" ${is_default ? 'selected' : ''}>Default</option>
+                            </select>
+                        </td>
+                        <td>
+                            <button class="btn btn-primary btn-xs am-save" data-id="${id}"><span class="material-icons-outlined text-base">check</span></button>
+                            <button class="btn btn-secondary btn-xs am-cancel ml-1"><span class="material-icons-outlined text-base">close</span></button>
+                        </td>
+                    `;
+
+                    // Save button handler
+                    tr.querySelector('.am-save').onclick = async function() {
+                        const id = this.getAttribute('data-id'); // Get ID from save button
+                        const model_name = tr.querySelector('.am-edit-name').value.trim();
+                        const description = tr.querySelector('.am-edit-description').value.trim();
+                        const is_default = tr.querySelector('.am-edit-default').value === 'true';
+
+                        if (!model_name) {
+                            alert('Please enter a model name');
+                            return;
+                        }
+
+                        tr.querySelector('.am-save').disabled = true;
+                        try {
+                            const resp = await fetch(`${API_BASE_URL}/api/admin/api-models/${id}`, {
+                                method: 'PUT',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ model_name, description, is_default })
+                            });
+                            if (!resp.ok) throw new Error(await resp.text());
+                            await fetchApiModels(true);
+                        } catch (err) {
+                            alert('Update failed: ' + err.message);
+                            tr.querySelector('.am-save').disabled = false;
+                        }
+                    };
+
+                    // Cancel button handler
+                    tr.querySelector('.am-cancel').onclick = function() {
+                        fetchApiModels(true);
+                    };
+                };
+            });
+
+            // Delete button handlers
+            document.querySelectorAll('#api-models-tbody .am-delete').forEach(btn => {
+                btn.onclick = async function() {
+                    const id = btn.getAttribute('data-id'); // Get ID from button
+                    if (!confirm('Are you sure you want to delete this API model?')) return;
+                    
+                    btn.disabled = true;
+                    try {
+                        const resp = await fetch(`${API_BASE_URL}/api/admin/api-models/${id}`, { 
+                            method: 'DELETE' 
+                        });
+                        if (!resp.ok) throw new Error(await resp.text());
+                        await fetchApiModels(true);
+                    } catch (err) {
+                        alert('Delete failed: ' + err.message);
+                        btn.disabled = false;
+                    }
+                };
+            });
+        }
+
+        // Function to fetch and display generated quizzes from GENERATED_QUIZZES table
+        async function fetchGeneratedQuizzes(forceRefresh = false) {
+            showCardLoading('quizzes');
+            if (!forceRefresh && dataCache.generatedQuizzes) {
+                renderGeneratedQuizzesTable(dataCache.generatedQuizzes.data);
+                markInitialLoadFetch();
+                return dataCache.generatedQuizzes;
+            }
+            const generatedQuizzesTableBody = document.getElementById('generated-quizzes-tbody');
+            showLoading(generatedQuizzesTableBody);
+            try {
+                debugLog('Fetching generated quizzes from GENERATED_QUIZZES table...');
+                const result = await apiRequest('/api/admin/generated-quizzes');
+                debugLog('Generated quizzes data received:', result);
+                renderGeneratedQuizzesTable(result.data);
+                dataCache.generatedQuizzes = result;
+                markInitialLoadFetch();
+                return result;
+            } catch (error) {
+                console.error('Error fetching generated quizzes:', error);
+                showError(generatedQuizzesTableBody, `Failed to load generated quizzes: ${error.message}`);
+                showCardCount('quizzes', 0);
+                markInitialLoadFetch();
+                throw error;
+            }
+        }
+        function renderGeneratedQuizzesTable(data) {
+            const generatedQuizzesTableBody = document.getElementById('generated-quizzes-tbody');
+            if (!data || data.length === 0) {
+                generatedQuizzesTableBody.innerHTML = `
+                    <tr>
+                        <td colspan="3" class="text-center py-8 text-gray-400">No generated quizzes found</td>
+                    </tr>
+                `;
+            } else {
+                generatedQuizzesTableBody.innerHTML = data.map(quiz => `
+                    <tr data-id="${quiz.id}">
+                        <td class="text-gray-400">${quiz.generated_at ? new Date(quiz.generated_at).toLocaleString() : 'N/A'}</td>
+                        <td class="text-gray-300 font-mono">${quiz.user_api_key || 'N/A'}</td>
+                        <td class="text-gray-200">${quiz.quiz_content ? `<button class='btn btn-secondary btn-xs quiz-view-content'>View Content</button>` : 'N/A'}</td>
+                    </tr>
+                `).join('');
+            }
+            attachQuizViewContentHandlers(data);
+            showCardCount('quizzes', countDataRows('generated-quizzes-tbody'));
+        }
+        function attachQuizViewContentHandlers(data) {
+            document.querySelectorAll('#generated-quizzes-tbody .quiz-view-content').forEach((btn, idx) => {
+                btn.onclick = function() {
+                    const tr = btn.closest('tr');
+                    const quizId = tr.getAttribute('data-id');
+                    openQuizContentModal(quizId, data);
+                };
+            });
+        }
+        function openQuizContentModal(quizId, data) {
+            const modal = document.getElementById('quiz-content-modal');
+            const loadingDiv = document.getElementById('quiz-modal-loading');
+            const contentDiv = document.getElementById('quiz-modal-content');
+            const pre = contentDiv.querySelector('pre');
+            loadingDiv.classList.remove('hidden');
+            contentDiv.classList.add('hidden');
+            modal.classList.remove('hidden');
+            // Find quiz content in data
+            const quiz = data.find(q => String(q.id) === String(quizId));
+            if (quiz && quiz.quiz_content) {
+                setTimeout(() => { // Simulate loading
+                    loadingDiv.classList.add('hidden');
+                    pre.textContent = typeof quiz.quiz_content === 'string' ? quiz.quiz_content : JSON.stringify(quiz.quiz_content, null, 2);
+                    contentDiv.classList.remove('hidden');
+                }, 500);
+            } else {
+                // Optionally, fetch from API if not present
+                loadingDiv.classList.add('hidden');
+                pre.textContent = 'Quiz content not found.';
+                contentDiv.classList.remove('hidden');
+            }
+        }
+        document.getElementById('quiz-modal-close').onclick = function() {
+            document.getElementById('quiz-content-modal').classList.add('hidden');
+        };
+
+        // Add this function before fetchUsageLimits and attachUsageLimitRowHandlers
+        function renderUsageLimitsTable(data) {
+            const usageLimitsTableBody = document.getElementById('usage-limits-tbody');
+            if (!data || data.length === 0) {
+                usageLimitsTableBody.innerHTML = `<tr><td colspan="7" class="text-center py-8 text-gray-400">No usage limits found</td></tr>`;
+            } else {
+                usageLimitsTableBody.innerHTML = data.map(limit => `
+                    <tr data-id="${limit.id}">
+                        <td><span class="ul-tier-name">${limit.tier_name || 'N/A'}</span></td>
+                        <td><span class="ul-daily">${limit.max_daily_limit ?? 'N/A'}</span></td>
+                        <td><span class="ul-monthly">${limit.max_monthly_limit ?? 'N/A'}</span></td>
+                        <td><span class="ul-price">${limit.price ?? 'N/A'}</span></td>
+                        <td>${limit.created_at ? new Date(limit.created_at).toLocaleString() : 'N/A'}</td>
+                        <td>${limit.updated_at ? new Date(limit.updated_at).toLocaleString() : 'N/A'}</td>
+                        <td>
+                            <button class="btn btn-secondary btn-xs ul-edit"><span class="material-icons-outlined text-base">edit</span></button>
+                            <button class="btn btn-secondary btn-xs ul-delete ml-1"><span class="material-icons-outlined text-base">delete</span></button>
+                        </td>
+                    </tr>
+                `).join('');
+            }
+            // Re-attach refresh button listeners in case DOM was replaced
+            initializeRefreshButtons();
+        }
+
+        // Function to fetch and display usage limits from USAGE_LIMITS table
+        async function fetchUsageLimits(forceRefresh = false) {
+            const usageLimitsTableBody = document.getElementById('usage-limits-tbody');
+            showLoading(usageLimitsTableBody);
+            try {
+                debugLog('Fetching usage limits from USAGE_LIMITS table...');
+                const result = await apiRequest('/api/admin/usage-limits');
+                debugLog('Usage limits data received:', result);
+                renderUsageLimitsTable(result.data);
+                attachUsageLimitRowHandlers(); // Add this line to attach handlers after rendering
+                markInitialLoadFetch();
+            } catch (error) {
+                console.error('Error fetching usage limits:', error);
+                usageLimitsTableBody.innerHTML = `<tr><td colspan="7" class="text-center py-8 text-red-400">Failed to load usage limits: ${error.message}</td></tr>`;
+                markInitialLoadFetch();
+            }
+        }
+
+        // Function to refresh all data
+        async function refreshAllData() {
+            debugLog('Refreshing all data...');
+            try {
+                await Promise.all([
+                    updateDashboardStats(true),
+                    fetchUsers(true),
+                    fetchApiKeys(true),
+                    fetchOpenRouterKeys(true),
+                    fetchApiModels(true),
+                    fetchGeneratedQuizzes(true),
+                    fetchUsageLimits(true)
+                ]);
+                debugLog('All data refreshed');
+            } catch (error) {
+                console.error('Error refreshing data:', error);
+            }
+        }
+
+        // On initial load, show loading for all cards
+        showCardLoading('users');
+        showCardLoading('openrouter');
+        showCardLoading('models');
+        showCardLoading('quizzes');
+        // Initial data fetch
+        fetchUsers();
+        fetchApiKeys();
+        fetchOpenRouterKeys();
+        fetchApiModels();
+        fetchGeneratedQuizzes();
+        fetchUsageLimits();
+
+        // Initialize refresh buttons
+        function initializeRefreshButtons() {
+            const refreshButtons = document.querySelectorAll('.refresh-btn');
+            refreshButtons.forEach(button => {
+                button.onclick = async function() {
+                    const type = button.getAttribute('data-refresh');
+                    debugLog(`Refreshing ${type}...`);
+                    try {
+                        switch (type) {
+                            case 'users':
+                                showCardLoading('users');
+                                await fetchUsers(true);
+                                break;
+                            case 'api-keys':
+                                await fetchApiKeys(true);
+                                break;
+                            case 'openrouter-keys':
+                                showCardLoading('openrouter');
+                                await fetchOpenRouterKeys(true);
+                                break;
+                            case 'api-models':
+                                showCardLoading('models');
+                                await fetchApiModels(true);
+                                break;
+                            case 'generated-quizzes':
+                                showCardLoading('quizzes');
+                                await fetchGeneratedQuizzes(true);
+                                break;
+                            case 'usage-limits':
+                                await fetchUsageLimits(true);
+                                break;
+                        }
+                    } catch (error) {
+                        console.error(`Error refreshing ${type}:`, error);
+                    }
+                };
+            });
+        }
+
+        // Tab switching functionality
+        function initializeTabs() {
+            const tabs = document.querySelectorAll('[data-tab]');
+            const sections = document.querySelectorAll('.section-content');
+
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    debugLog('Tab clicked:', tab.getAttribute('data-tab'));
+                    // Remove active class from all tabs
+                    tabs.forEach(t => {
+                        t.classList.remove('tab-active');
+                        t.classList.add('tab-inactive');
+                    });
+
+                    // Add active class to clicked tab
+                    tab.classList.remove('tab-inactive');
+                    tab.classList.add('tab-active');
+
+                    // Hide all sections
+                    sections.forEach(section => {
+                        section.classList.add('hidden');
+                    });
+
+                    // Show the selected section
+                    const targetSection = document.getElementById(tab.getAttribute('data-tab'));
+                    if (targetSection) {
+                        targetSection.classList.remove('hidden');
+                        // Load data if not already loaded (no loading animation on cards)
+                        if (targetSection.id === 'users-section') {
+                            fetchUsers();
+                            fetchApiKeys();
+                        } else if (targetSection.id === 'openrouter-section') {
+                            fetchOpenRouterKeys();
+                            fetchApiModels();
+                        } else if (targetSection.id === 'logs-section') {
+                            fetchGeneratedQuizzes();
+                        } else if (targetSection.id === 'usage-limits-section') {
+                            // Remove fetchUsageLimits() from tab switch logic
+                        }
+                    }
+                });
+            });
+        }
+
+        // Initialize tabs and refresh buttons
+        initializeTabs();
+        initializeRefreshButtons();
+
+        // Create Usage Limit
+        const usageLimitCreateForm = document.getElementById('usage-limit-create-form');
+        if (usageLimitCreateForm) {
+            usageLimitCreateForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const tier_name = document.getElementById('ul-tier-name').value.trim();
+                const max_daily_limit = parseInt(document.getElementById('ul-daily').value, 10);
+                const max_monthly_limit = parseInt(document.getElementById('ul-monthly').value, 10);
+                const price = parseFloat(document.getElementById('ul-price').value);
+                const statusSpan = document.getElementById('ul-create-status');
+                statusSpan.textContent = 'Adding...';
+                try {
+                    const resp = await fetch(`${API_BASE_URL}/api/admin/usage-limits`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ tier_name, max_daily_limit, max_monthly_limit, price })
+                    });
+                    if (!resp.ok) throw new Error(await resp.text());
+                    statusSpan.textContent = 'Added!';
+                    usageLimitCreateForm.reset();
+                    fetchUsageLimits(true);
+                } catch (err) {
+                    statusSpan.textContent = 'Error: ' + err.message;
+                } finally {
+                    setTimeout(() => { statusSpan.textContent = ''; }, 2000);
+                }
+            });
+        }
+
+        // Attach edit/delete handlers
+        function attachUsageLimitRowHandlers() {
+            // Edit button handlers
+            document.querySelectorAll('#usage-limits-tbody .ul-edit').forEach(btn => {
+                btn.onclick = function() {
+                    const tr = btn.closest('tr');
+                    if (!tr || tr.classList.contains('editing')) return;
+                    
+                    const id = tr.getAttribute('data-id');
+                    const tier = tr.querySelector('.ul-tier-name').textContent;
+                    const daily = tr.querySelector('.ul-daily').textContent;
+                    const monthly = tr.querySelector('.ul-monthly').textContent;
+                    const price = tr.querySelector('.ul-price').textContent;
+
+                    tr.classList.add('editing');
+                    tr.innerHTML = `
+                        <td><input type="text" value="${tier}" class="rounded px-2 py-1 ul-editable-input ul-edit-tier" /></td>
+                        <td><input type="number" value="${daily}" class="rounded px-2 py-1 ul-editable-input ul-edit-daily" /></td>
+                        <td><input type="number" value="${monthly}" class="rounded px-2 py-1 ul-editable-input ul-edit-monthly" /></td>
+                        <td><input type="number" step="0.01" value="${price}" class="rounded px-2 py-1 ul-editable-input ul-edit-price" /></td>
+                        <td colspan="2"></td>
+                        <td>
+                            <button class="btn btn-primary btn-xs ul-save"><span class="material-icons-outlined text-base">check</span></button>
+                            <button class="btn btn-secondary btn-xs ul-cancel ml-1"><span class="material-icons-outlined text-base">close</span></button>
+                        </td>
+                    `;
+
+                    // Save button handler
+                    tr.querySelector('.ul-save').onclick = async function() {
+                        const tier_name = tr.querySelector('.ul-edit-tier').value.trim();
+                        const max_daily_limit = parseInt(tr.querySelector('.ul-edit-daily').value, 10);
+                        const max_monthly_limit = parseInt(tr.querySelector('.ul-edit-monthly').value, 10);
+                        const price = parseFloat(tr.querySelector('.ul-edit-price').value);
+
+                        if (!tier_name || isNaN(max_daily_limit) || isNaN(max_monthly_limit) || isNaN(price)) {
+                            alert('Please fill in all fields with valid values');
+                            return;
+                        }
+
+                        tr.querySelector('.ul-save').disabled = true;
+                        try {
+                            const resp = await fetch(`${API_BASE_URL}/api/admin/usage-limits/${id}`, {
+                                method: 'PUT',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ tier_name, max_daily_limit, max_monthly_limit, price })
+                            });
+                            if (!resp.ok) throw new Error(await resp.text());
+                            await fetchUsageLimits(true);
+                        } catch (err) {
+                            alert('Update failed: ' + err.message);
+                            tr.querySelector('.ul-save').disabled = false;
+                        }
+                    };
+
+                    // Cancel button handler
+                    tr.querySelector('.ul-cancel').onclick = function() {
+                        fetchUsageLimits(true);
+                    };
+                };
+            });
+
+            // Delete button handlers
+            document.querySelectorAll('#usage-limits-tbody .ul-delete').forEach(btn => {
+                btn.onclick = async function() {
+                    const tr = btn.closest('tr');
+                    const id = tr.getAttribute('data-id');
+                    if (!confirm('Are you sure you want to delete this usage limit?')) return;
+                    
+                    btn.disabled = true;
+                    try {
+                        const resp = await fetch(`${API_BASE_URL}/api/admin/usage-limits/${id}`, { 
+                            method: 'DELETE' 
+                        });
+                        if (!resp.ok) throw new Error(await resp.text());
+                        await fetchUsageLimits(true);
+                    } catch (err) {
+                        alert('Delete failed: ' + err.message);
+                        btn.disabled = false;
+                    }
+                };
+            });
+        }
+
+        // Create OpenRouter Key
+        const openrouterKeyCreateForm = document.getElementById('openrouter-key-create-form');
+        if (openrouterKeyCreateForm) {
+            openrouterKeyCreateForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const description = document.getElementById('or-key-description').value.trim();
+                const api_key = document.getElementById('or-key-apikey').value.trim();
+                const is_default = document.getElementById('or-key-default').value === 'true';
+                const statusSpan = document.getElementById('or-key-create-status');
+                statusSpan.textContent = 'Adding...';
+                try {
+                    const resp = await fetch(`${API_BASE_URL}/api/admin/openrouter-keys`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ description, api_key, is_default })
+                    });
+                    if (!resp.ok) throw new Error(await resp.text());
+                    statusSpan.textContent = 'Added!';
+                    openrouterKeyCreateForm.reset();
+                    fetchOpenRouterKeys(true);
+                } catch (err) {
+                    statusSpan.textContent = 'Error: ' + err.message;
+                } finally {
+                    setTimeout(() => { statusSpan.textContent = ''; }, 2000);
+                }
+            });
+        }
+
+        // System Health Check logic
+        const healthCheckBtn = document.getElementById('health-check-btn');
+        const healthCheckLoading = document.getElementById('health-check-loading');
+        const healthCheckResults = document.getElementById('health-check-results');
+
+        async function runHealthCheck() {
+            healthCheckResults.innerHTML = '';
+            healthCheckLoading.classList.remove('hidden');
+            try {
+                const resp = await fetch(`${API_BASE_URL}/api/admin/system-health`);
+                if (!resp.ok) throw new Error(await resp.text());
+                const result = await resp.json();
+                const data = result.data;
+                healthCheckResults.innerHTML = `
+                    <div class="card text-center">
+                        <span class="material-icons text-4xl mb-2 ${data.database.status === 'ok' ? 'text-green-400' : 'text-red-400'}">storage</span>
+                        <h4 class="font-semibold text-gray-100 mb-1">Database</h4>
+                        <p class="text-gray-400 mb-1">Status: <span class="${data.database.status === 'ok' ? 'text-green-400' : 'text-red-400'}">${data.database.status.toUpperCase()}</span></p>
+                        <p class="text-gray-400 mb-1">Latency: <span class="text-blue-400">${data.database.latency_ms} ms</span></p>
+                        ${data.database.error ? `<p class='text-red-400 text-xs'>${data.database.error}</p>` : ''}
+                    </div>
+                    <div class="card text-center">
+                        <span class="material-icons text-4xl mb-2 ${data.openrouter.status === 'ok' ? 'text-green-400' : 'text-red-400'}">router</span>
+                        <h4 class="font-semibold text-gray-100 mb-1">OpenRouter API</h4>
+                        <p class="text-gray-400 mb-1">Status: <span class="${data.openrouter.status === 'ok' ? 'text-green-400' : 'text-red-400'}">${data.openrouter.status.toUpperCase()}</span></p>
+                        <p class="text-gray-400 mb-1">Latency: <span class="text-blue-400">${data.openrouter.latency_ms} ms</span></p>
+                        ${data.openrouter.error ? `<p class='text-red-400 text-xs'>${data.openrouter.error}</p>` : ''}
+                    </div>
+                `;
+            } catch (err) {
+                healthCheckResults.innerHTML = `<div class='text-red-400'>Failed to run health check: ${err.message}</div>`;
+            } finally {
+                healthCheckLoading.classList.add('hidden');
+            }
+        }
+        if (healthCheckBtn) {
+            healthCheckBtn.onclick = runHealthCheck;
+        }
+
+        // Database Tables Health
+        const dbTablesBtn = document.getElementById('db-tables-health-btn');
+        const dbTablesLoading = document.getElementById('db-tables-health-loading');
+        const dbTablesResults = document.getElementById('db-tables-health-results');
+        async function runDbTablesHealth() {
+            dbTablesResults.innerHTML = '';
+            dbTablesLoading.classList.remove('hidden');
+            try {
+                const resp = await fetch(`${API_BASE_URL}/api/admin/db-tables-health`);
+                if (!resp.ok) throw new Error(await resp.text());
+                const result = await resp.json();
+                const data = result.data;
+                let okCount = 0;
+                dbTablesResults.innerHTML = `<table class='table'><thead><tr><th>Table</th><th>Status</th><th>Latency (ms)</th><th>Error</th></tr></thead><tbody>
+                    ${data.map(row => {
+                        if (row.status === 'ok') okCount++;
+                        return `<tr>
+                            <td>${row.table}</td>
+                            <td class='${row.status === 'ok' ? 'text-green-400' : 'text-red-400'}'>${row.status.toUpperCase()}</td>
+                            <td>${row.latency_ms}</td>
+                            <td class='text-xs text-red-400'>${row.error ? row.error : ''}</td>
+                        </tr>`;
+                    }).join('')}
+                </tbody></table>
+                <div class='mt-2 text-gray-300'>${okCount} / ${data.length} tables OK</div>`;
+                updateFinalHealthReport();
+            } catch (err) {
+                dbTablesResults.innerHTML = `<div class='text-red-400'>Failed to check tables: ${err.message}</div>`;
+            } finally {
+                dbTablesLoading.classList.add('hidden');
+            }
+        }
+        if (dbTablesBtn) dbTablesBtn.onclick = runDbTablesHealth;
+
+        // OpenRouter Prompt Complexity Health
+        const orPromptsBtn = document.getElementById('openrouter-prompts-health-btn');
+        const orPromptsLoading = document.getElementById('openrouter-prompts-health-loading');
+        const orPromptsResults = document.getElementById('openrouter-prompts-health-results');
+        let lastPromptResults = [];
+        async function runOpenRouterPromptsHealth() {
+            orPromptsResults.innerHTML = '';
+            orPromptsLoading.classList.remove('hidden');
+            try {
+                const resp = await fetch(`${API_BASE_URL}/api/admin/openrouter-prompts-health`);
+                if (!resp.ok) throw new Error(await resp.text());
+                const result = await resp.json();
+                if (result.status === 'error' || !result.data) {
+                    orPromptsResults.innerHTML = `<div class='text-red-400'>Failed to check prompts: ${result.error || 'Unknown error'}</div>`;
+                    return;
+                }
+                const data = result.data;
+                lastPromptResults = data;
+                let okCount = 0;
+                orPromptsResults.innerHTML = `<table class='table'><thead><tr><th>Prompt</th><th>Status</th><th>Latency (ms)</th><th>View</th><th>Error</th></tr></thead><tbody>
+                    ${data.map(row => {
+                        if (row.status === 'ok') okCount++;
+                        return `<tr>
+                            <td class='capitalize'>${row.level}</td>
+                            <td class='${row.status === 'ok' ? 'text-green-400' : 'text-red-400'}'>${row.status.toUpperCase()}</td>
+                            <td>${row.latency_ms}</td>
+                            <td><button class='btn btn-secondary btn-xs prompt-view-btn' data-level='${row.level}'>View</button></td>
+                            <td class='text-xs text-red-400'>${row.error ? row.error : ''}</td>
+                        </tr>`;
+                    }).join('')}
+                </tbody></table>
+                <div class='mt-2 text-gray-300'>${okCount} / ${data.length} prompts OK</div>`;
+                attachPromptViewHandlers();
+                updateFinalHealthReport();
+            } catch (err) {
+                orPromptsResults.innerHTML = `<div class='text-red-400'>Failed to check prompts: ${err.message}</div>`;
+            } finally {
+                orPromptsLoading.classList.add('hidden');
+            }
+        }
+        if (orPromptsBtn) orPromptsBtn.onclick = runOpenRouterPromptsHealth;
+
+        // Prompt Modal logic
+        function attachPromptViewHandlers() {
+            document.querySelectorAll('.prompt-view-btn').forEach(btn => {
+                btn.onclick = function() {
+                    const level = btn.getAttribute('data-level');
+                    const prompt = lastPromptResults.find(r => r.level === level)?.prompt || '';
+                    openPromptModal(prompt);
+                };
+            });
+        }
+        function openPromptModal(prompt) {
+            const modal = document.getElementById('prompt-modal');
+            const loadingDiv = document.getElementById('prompt-modal-loading');
+            const contentDiv = document.getElementById('prompt-modal-content');
+            const pre = contentDiv.querySelector('pre');
+            loadingDiv.classList.remove('hidden');
+            contentDiv.classList.add('hidden');
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                loadingDiv.classList.add('hidden');
+                pre.textContent = prompt;
+                contentDiv.classList.remove('hidden');
+            }, 300);
+        }
+        document.getElementById('prompt-modal-close').onclick = function() {
+            document.getElementById('prompt-modal').classList.add('hidden');
+        };
+
+        // Final Health Report
+        function updateFinalHealthReport() {
+            const dbOk = dbTablesResults.innerHTML.includes('tables OK') ? dbTablesResults.innerHTML.match(/(\d+) \/ (\d+) tables OK/) : null;
+            const promptOk = orPromptsResults.innerHTML.includes('prompts OK') ? orPromptsResults.innerHTML.match(/(\d+) \/ (\d+) prompts OK/) : null;
+            let html = '';
+            if (dbOk) html += `<div class='mb-2'>Database Tables: <span class='${dbOk[1] === dbOk[2] ? 'text-green-400' : 'text-red-400'}'>${dbOk[1]} / ${dbOk[2]} OK</span></div>`;
+            if (promptOk) html += `<div class='mb-2'>OpenRouter Prompts: <span class='${promptOk[1] === promptOk[2] ? 'text-green-400' : 'text-red-400'}'>${promptOk[1]} / ${promptOk[2]} OK</span></div>`;
+            if (!html) html = '<div class="text-gray-400">No report yet. Run checks above.</div>';
+            document.getElementById('final-health-report').innerHTML = html;
+        }
+    });
+
+    // Make ADMIN_PASSWORD available globally for overlay and all logic
+    const ADMIN_PASSWORD = 'Admin-HU-yaar';
+
+    // All admin JS logic is wrapped in this function
+    window.__adminInit = function() {
+        // Refresh All function
+        async function refreshAllData() {
+            await Promise.all([
+                updateDashboardStats(true),
+                fetchUsers(true),
+                fetchApiKeys(true),
+                fetchOpenRouterKeys(true),
+                fetchApiModels(true),
+                fetchGeneratedQuizzes(true),
+                fetchUsageLimits(true)
+            ]);
+        }
+
+        // Initialize tabs and refresh buttons
+        initializeTabs();
+        initializeRefreshButtons();
+
+        // Initial data fetch
+        refreshAllData();
+
+        // Attach to Refresh All button
+        const refreshAllBtn = document.getElementById('refresh-all-btn');
+        if (refreshAllBtn) refreshAllBtn.onclick = refreshAllData;
+    }; // End of window.__adminInit
+
+    // Password overlay logic (show/hide toggle, success message)
+    document.addEventListener('DOMContentLoaded', function() {
+        const overlay = document.getElementById('admin-password-overlay');
+        const adminContent = document.getElementById('admin-content');
+        const input = document.getElementById('admin-password-input');
+        const submit = document.getElementById('admin-password-submit');
+        const error = document.getElementById('admin-password-error');
+        const success = document.getElementById('admin-password-success');
+        const toggle = document.getElementById('admin-password-toggle');
+        const toggleIcon = document.getElementById('admin-password-toggle-icon');
+        let show = false;
+
+        function updateToggle() {
+            input.type = show ? 'text' : 'password';
+            toggleIcon.textContent = show ? 'visibility' : 'visibility_off';
+        }
+
+        toggle.onclick = function() {
+            show = !show;
+            updateToggle();
+            input.focus();
+        };
+
+        updateToggle();
+
+        function tryUnlock() {
+            error.classList.add('hidden');
+            success.classList.add('hidden');
+            if (input.value === ADMIN_PASSWORD) {
+                success.classList.remove('hidden');
+                setTimeout(() => {
+                    overlay.style.display = 'none';
+                    adminContent.classList.remove('hidden');
+                    // Initialize admin dashboard after successful authentication
+                    window.__adminInit();
+                }, 1000);
+            } else {
+                error.classList.remove('hidden');
+                input.value = '';
+                input.focus();
+                setTimeout(() => error.classList.add('hidden'), 2000);
+            }
+        }
+
+        submit.onclick = tryUnlock;
+        input.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') tryUnlock();
+        });
+        input.focus();
+    });
+    ;
+
+    // Add this function to handle collapsible sections
+    function toggleSection(header) {
+        const content = header.nextElementSibling;
+        const icon = header.querySelector('.collapsible-icon');
+        
+        // Toggle the expanded class on the content
+        content.classList.toggle('expanded');
+        // Toggle the expanded class on the icon
+        icon.classList.toggle('expanded');
+    }
+</script>
+<!-- Quiz Content Modal -->
+<div id="quiz-content-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60 hidden">
+    <div class="bg-gray-900 rounded-lg shadow-lg w-full max-w-5xl mx-4 p-8 relative" style="min-width: 600px; min-height: 400px;">
+        <button id="quiz-modal-close" class="absolute top-2 right-2 text-gray-400 hover:text-red-400">
+            <span class="material-icons-outlined text-2xl">close</span>
+        </button>
+        <div id="quiz-modal-loading" class="flex flex-col items-center justify-center py-8">
+            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mb-2"></div>
+            <span class="text-gray-400">Loading quiz content...</span>
+        </div>
+        <div id="quiz-modal-content" class="hidden">
+            <h3 class="text-lg font-semibold text-gray-100 mb-2">Quiz Content</h3>
+            <pre class="bg-gray-800 rounded p-4 text-gray-200 overflow-x-auto" style="max-height: 70vh; min-height: 300px;"></pre>
+        </div>
+    </div>
+</div>
+<!-- Prompt Modal -->
+<div id="prompt-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60 hidden">
+    <div class="bg-gray-900 rounded-lg shadow-lg w-full max-w-2xl mx-4 p-6 relative">
+        <button id="prompt-modal-close" class="absolute top-2 right-2 text-gray-400 hover:text-red-400">
+            <span class="material-icons-outlined text-2xl">close</span>
+        </button>
+        <div id="prompt-modal-loading" class="flex flex-col items-center justify-center py-8 hidden">
+            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mb-2"></div>
+            <span class="text-gray-400">Loading prompt...</span>
+        </div>
+        <div id="prompt-modal-content" class="hidden">
+            <h3 class="text-lg font-semibold text-gray-100 mb-2">Prompt</h3>
+            <pre class="bg-gray-800 rounded p-4 text-gray-200 overflow-x-auto" style="max-height: 400px;"></pre>
+        </div>
+    </div>
+</div>
+</body>
+</html>
