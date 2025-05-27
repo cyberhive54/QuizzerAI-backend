@@ -1,8 +1,13 @@
 from fastapi import FastAPI, Request, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
 from dotenv import load_dotenv
 import os
 import json
+from utils import verify_api_key
+from prompt_selector import select_and_customize_prompt
+from utils import fetch_api_config, call_openrouter_api, save_generated_quiz
+from admin_crud import router as admin_router
 
 # Load environment variables
 load_dotenv()
@@ -22,10 +27,29 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-from utils import verify_api_key # Import the actual verification function
-from prompt_selector import select_and_customize_prompt # Import the prompt selection function
-from utils import fetch_api_config, call_openrouter_api, save_generated_quiz # Import the necessary utility functions
-from admin_crud import router as admin_router # Import the admin router
+# Models
+class QuizRequest(BaseModel):
+    topic: str
+    difficulty: str = "medium"
+    num_questions: int = 5
+    model_name: str = None
+    model_config = {
+        "protected_namespaces": ()
+    }
+
+class QuizResponse(BaseModel):
+    quiz_id: str
+    questions: list
+    model_used: str
+    model_config = {
+        "protected_namespaces": ()
+    }
+
+class ErrorResponse(BaseModel):
+    error: str
+    model_config = {
+        "protected_namespaces": ()
+    }
 
 # Include the admin router
 app.include_router(admin_router)
