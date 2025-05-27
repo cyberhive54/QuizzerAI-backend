@@ -17,7 +17,11 @@ app = FastAPI()
 
 # Add CORS middleware
 origins = [
-    "*" # Allow all origins for local testing
+    "https://quizzerai-backend.onrender.com",
+    "http://localhost:8000",
+    "http://127.0.0.1:8000",
+    "http://localhost:5500",
+    "http://127.0.0.1:5500"
 ]
 
 app.add_middleware(
@@ -27,13 +31,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-# Include the admin router BEFORE mounting static files
-app.include_router(admin_router)
-
-# Mount static files for admin and frontend AFTER router inclusion
-app.mount("/admin", StaticFiles(directory="admin"), name="admin")
-app.mount("/", StaticFiles(directory="frontend", html=True), name="frontend")
 
 # Models
 class QuizRequest(BaseModel):
@@ -58,6 +55,9 @@ class ErrorResponse(BaseModel):
     model_config = {
         "protected_namespaces": ()
     }
+
+# Include the admin router
+app.include_router(admin_router)
 
 @app.post("/generate-quiz")
 async def generate_quiz(request: Request):
@@ -114,5 +114,9 @@ async def generate_quiz(request: Request):
         return {"quiz_content": quiz_content}
     else:
         raise HTTPException(status_code=500, detail="Failed to generate quiz from API")
+
+# Mount static files AFTER all API routes
+app.mount("/admin", StaticFiles(directory="admin"), name="admin")
+app.mount("/", StaticFiles(directory="frontend", html=True), name="frontend")
 
 # To run the app, use: uvicorn app:app --reload
